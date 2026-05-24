@@ -1,1 +1,80 @@
-/* You can add global styles to this file, and also import other style files */
+// Global Colors pallete
+:root {
+    --primary: #002547;
+    --primary2: #1b3b5f;
+    --main-hover: #2a486d;
+    --span: #88a6cf;
+    --span2: #abc8f4;
+    --secondary: #fc9d33;
+    --secondary-hover: #ffb873;
+    --highlight: #000000;
+    --bg: #f7fafc;
+    --shadow: #000000;
+    --titles: #ffffff;
+    --subtitles: #000000;
+    --borders: #000000;
+    --alert: #ba1a1a;
+    --warning: #000000;
+    --ok: #000000;
+    --error-container: #ffdad6;
+}
+
+//Global fonts
+@font-face {
+    font-family: 'Manrope';
+    src: url(assets/fonts/Manrope/Manrope-VariableFont_wght.ttf) format(truetype);
+}
+
+@font-face {
+    font-family: 'Space-Grotesk';
+    src: url(assets/fonts/Space-Grotesk/SpaceGrotesk-VariableFont_wght.ttf) format(truetype);
+}
+
+//font variables
+:root {
+    --font-titles: 'Space-Grotesk', sans-serif;
+    --font-subtitles: 'Manrope', sans-serif;
+    --font-span: 'Manrope', sans-serif;
+    --font-btns: 'Manrope', sans-serif;
+    --font-highlights: 'Manrope', sans-serif;
+}
+
+//Rules -------------------------------------------------------------------------------------------------------
+
+/*Scrolls bars*/
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+    display: none;
+}
+
+html {
+    background-color: var(--main);
+
+    /* Firefox */
+    scrollbar-width: none;
+}
+
+body {
+    /* IE / Edge antiguo */
+    -ms-overflow-style: none;
+
+    margin: 0;
+    min-height: 100vh;
+    background-attachment: fixed;
+}
+
+/*Making the navbar scroolling smooth*/
+html,
+body {
+    scroll-behavior: smooth;
+    scroll-padding-top: 100px;
+}
+
+/*Responsive mock*/
+@media (max-width: 415px) {}
+
+@media (min-width: 416px) {}
+
+@media (min-width: 700px) {}
+
+@media screen and (min-width: 1024px) {}
