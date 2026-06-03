@@ -1,1 +1,85 @@
-<p>login works!</p>
+<div class="login">
+    <div class="login__title">
+        <h2>Bienvenido de nuevo</h2>
+        <span>Accede a tu panel de control.</span>
+    </div>
+    <form class="login__form" #loginForm="ngForm" (ngSubmit)="onLoginSubmit(loginForm)">
+        <div class="login__form-group">
+            <label>Correo electronico</label>
+            <div class="login__form-input-container">
+                <img class="login__form-input-icon" src="assets/icons/email-icon.svg" alt="Email icon" />
+                <input class="login__form-input" type="email" id="email" name="email" placeholder="ejemplo@correo.com"
+                    required ngModel #email="ngModel" minlength="8" />
+            </div>
+
+            <!-- error cases -->
+            <span class="login__input-error" *ngIf="email.invalid && (email.touched || loginForm.submitted)">
+
+                <span *ngIf="email.errors?.['required']">
+                    El correo es requerido
+                </span>
+
+                <span *ngIf="email.errors?.['email']">
+                    Ingresa un correo valido
+                </span>
+
+            </span>
+        </div>
+        <div class="login__form-group">
+            <div class="login__form-group-title">
+                <label>Contrasena</label><span>¿Olvidaste tu contraseña?</span>
+            </div>
+            <div class="login__form-input-container">
+                <img class="login__form-input-icon" src="assets/icons/lock-icon.svg" alt="Lock icon" />
+                <input class="login__form-input" type="password" id="password" name="password"
+                    placeholder="Ingresa tu contraseña" required ngModel #password="ngModel" minlength="6" />
+            </div>
+        </div>
+
+        <button class="login__submit-btn" type="submit" [disabled]="isLoading">
+            <span *ngIf="!isLoading">Ingresar al Sistema</span>
+            <span *ngIf="isLoading" class="login__submit-btn-sending">
+                <span class="spinner"></span>
+                Ingresando...
+            </span>
+        </button>
+
+        <div *ngIf="errorMessage" class="form-message">
+
+            <!--<div *ngIf="messageStatus === 'success'" class="message success-message">
+                <span class="message-icon">✓</span>
+                <div class="message-text">
+                    <strong>Message sent!</strong>
+                    <p>I will get back to you soon.</p>
+                </div>
+            </div>-->
+    
+            <div *ngIf="errorMessage === 'error'" class="message error-message">
+                <span class="message-icon">⚠</span>
+                <div class="message-text">
+                    <strong>Algo ha salido mal</strong>
+                    <p>{{ errorMessage }}</p>
+                </div>
+            </div>
+    
+            <!--<div *ngIf="messageStatus === 'rateLimit'" class="message rate-limit-message">
+                <span class="message-icon">⏱</span>
+                <div class="message-text">
+                    <strong>Please wait</strong>
+                    <p>You can send another message in a few seconds.</p>
+                </div>
+            </div>-->
+    
+        </div>
+    </form>
+
+    <div class="login__divider">
+        <div class="login__divider-line"></div>
+        <span>O continuar con</span>
+        <div class="login__divider-line"></div>
+    </div>
+    <div class="login__ways">
+        <a><img src="assets/icons/google-icon.svg"/> Google</a>
+        <a><img src="assets/icons/facebook-icon.svg"/> Facebook</a>
+    </div>
+</div>

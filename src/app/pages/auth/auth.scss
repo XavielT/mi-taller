@@ -1,0 +1,123 @@
+.auth {
+    display: flex;
+    min-height: 100vh;
+
+
+    &__left-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        /*position: relative;
+
+        width: 50%;
+        overflow: hidden;*/
+
+        background-image: linear-gradient(rgba(0, 37, 71, 0.7), rgba(0, 37, 71, 0.7)),
+            url('/assets/imgs/auth/auth-bg.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 50%;
+
+        img {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+    }
+
+    /*&__left-container-bg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+        pointer-events: none;
+    }*/
+
+    &__title-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        h1 {
+            font-family: var(--font-titles);
+            color: #ffffff;
+            font-size: 40px;
+            margin: 0;
+        }
+
+        span {
+            font-family: var(--font-span);
+            font-size: 18px;
+            color: var(--span);
+        }
+    }
+
+    &__skills {
+        display: flex;
+        gap: 20px;
+        margin: 30px 0 0 0;
+    }
+
+    &__skills-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            width: 40px;
+            margin: 0;
+            margin-bottom: 10px;
+        }
+
+        span {
+            font-family: var(--font-span);
+            font-size: 15px;
+            color: #ffffff;
+        }
+    }
+
+    /* Right side ------------------------------------------------------------------ */
+
+    &__right-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        //padding: 40px 0;
+        background-color: var(--bg);
+        width: 50%;
+    }
+
+    &__nav {
+        display: flex;
+        gap: 20px;
+        border-bottom: 1px solid var(--gray-ultra-light);
+        padding: 6px 0;
+        //width: 100%;
+
+        a {
+            text-decoration: none;
+            list-style: none;
+            font-family: var(--font-titles);
+            font-size: 25px;
+            color: var(--primary);
+            font-weight: bold;
+            padding: 0 40px;
+        }
+    }
+}
+
+footer {
+    font-family: var(--font-span);
+    font-size: 15px;
+    color: var(--gray-ultra-light);
+    margin-top: 30px;
+    margin-bottom: 30px;
+    text-align: center;
+}

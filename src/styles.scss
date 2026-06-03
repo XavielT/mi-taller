@@ -2,7 +2,7 @@
 :root {
     --primary: #002547;
     --primary2: #1b3b5f;
-    --main-hover: #2a486d;
+    --primary-hover: #2a486d;
     --span: #88a6cf;
     --span2: #abc8f4;
     --secondary: #fc9d33;
@@ -17,6 +17,8 @@
     --warning: #000000;
     --ok: #000000;
     --error-container: #ffdad6;
+    --gray-ultra-light:#929090;
+    --input-bg: #eaeaea;
 }
 
 //Global fonts
@@ -37,6 +39,8 @@
     --font-span: 'Manrope', sans-serif;
     --font-btns: 'Manrope', sans-serif;
     --font-highlights: 'Manrope', sans-serif;
+    --font-body: 'Manrope', sans-serif;
+    --font-label: 'Manrope', sans-serif;
 }
 
 //Rules -------------------------------------------------------------------------------------------------------
