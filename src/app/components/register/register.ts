@@ -36,7 +36,12 @@ export class Register {
         password: form.value.password
       });
 
-      this.router.navigate(['/home'])
+      this.errorMessage = 'success';
+
+      setTimeout(() => {
+        this.router.navigate(['/home']);
+      }, 3000)
+
     } catch (error: any) {
       this.errorMessage = error.message;
     } finally {

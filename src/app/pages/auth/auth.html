@@ -1,37 +1,44 @@
 <div class="auth">
     <div class="auth__left-container">
         <!--<img class="auth__left-container-bg" src="assets/imgs/auth/auth-bg.png"/>-->
-        <img src="assets/imgs/auth/mi-taller-logo.png"/>
+        <img src="assets/imgs/auth/mi-taller-logo.png" />
         <div class="auth__title-container">
             <h1>Mi Taller</h1>
             <span>Gestion inteligente para tu taller. Precision tecnica en cada proceso</span>
         </div>
         <div class="auth__skills">
             <div class="auth__skills-item">
-                <img src="assets/icons/check-icon.svg"/>
+                <img src="assets/icons/check-icon.svg" />
                 <span>Eficiencia</span>
             </div>
             <div class="auth__skills-item">
-                <img src="assets/icons/certified-icon.svg"/>
+                <img src="assets/icons/certified-icon.svg" />
                 <span>Confianza</span>
             </div>
             <div class="auth__skills-item">
-                <img src="assets/icons/speedometer-icon.svg"/>
+                <img src="assets/icons/speedometer-icon.svg" />
                 <span>Velocidad</span>
             </div>
             <div class="auth__skills-item">
-                <img src="assets/icons/analytics2-icon.svg"/>
+                <img src="assets/icons/analytics2-icon.svg" />
                 <span>Analisis</span>
             </div>
         </div>
     </div>
     <div class="auth__right-container">
         <div class="auth__nav">
-            <a routerLink="login">Iniciar Sesion</a>
-            <a routerLink="register">Crear Cuenta</a>
-           
+            <a routerLink="login" routerLinkActive="navActive">Iniciar Sesion</a>
+            <a routerLink="register" routerLinkActive="navActive">Crear Cuenta</a>
+
         </div>
-        <router-outlet></router-outlet>
+        <div
+            #viewContainer
+            class="auth__view-container"
+            [@fadeAnimation]="getRouteState(outlet)"
+            (@fadeAnimation.done)="onRouteAnimationDone($event)"
+            [style.min-height]="viewHeight">
+            <router-outlet #outlet="outlet" (deactivate)="onDeactivate()"></router-outlet>
+        </div>
         <footer>© 2026 Mi Taller. Derechos reservados.</footer>
     </div>
 </div>
