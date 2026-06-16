@@ -1,0 +1,88 @@
+.sidebar {
+	width: 260px;
+	min-height: 100vh;
+	background: linear-gradient(180deg, var(--primary) 0%, var(--primary2) 100%);
+	color: var(--titles);
+	display: flex;
+	flex-direction: column;
+	padding: 20px 16px;
+	box-sizing: border-box;
+}
+
+.sidebar__brand {
+	display:flex;
+	align-items:center;
+	gap:12px;
+	margin-bottom: 20px;
+}
+
+.sidebar__logo {
+	width:44px;
+	height:44px;
+	border-radius:8px;
+	object-fit:cover;
+}
+
+.sidebar__title {
+	font-family: var(--font-titles);
+	font-size: 16px;
+	color: var(--titles);
+}
+
+.sidebar__subtitle {
+	font-family: var(--font-subtitles);
+	font-size: 12px;
+	color: rgba(255,255,255,0.85);
+}
+
+.sidebar__nav {
+	list-style:none;
+	padding:0;
+	margin: 8px 0 0 0;
+	display:flex;
+	flex-direction:column;
+	gap:8px;
+}
+
+.sidebar__nav li {
+	padding:10px 12px;
+	border-radius:8px;
+	cursor:pointer;
+	color: rgba(255,255,255,0.95);
+	font-family: var(--font-span);
+}
+
+.sidebar__nav li.active,
+.sidebar__nav li:hover {
+	background: rgba(255,255,255,0.06);
+}
+
+/* make active look like the orange highlight from the design */
+.sidebar__nav li.active {
+	background: var(--secondary);
+	color: #fff;
+}
+
+.sidebar__actions {
+	margin-top: auto;
+	display:flex;
+	flex-direction:column;
+	gap:8px;
+}
+
+.btn {
+	border: none;
+	padding: 10px 12px;
+	border-radius: 10px;
+	font-family: var(--font-btns);
+}
+
+.btn--primary {
+	background: var(--secondary);
+	color: #fff;
+}
+
+.btn--link {
+	background: transparent;
+	color: rgba(255,255,255,0.9);
+}

@@ -1,0 +1,21 @@
+
+.page.repairs { padding:24px; font-family: var(--font-body); color: var(--subtitles) }
+.board { display:flex; gap:16px; align-items:flex-start }
+.column { background:#fff; border:1px solid rgba(0,0,0,0.04); padding:14px; width:300px; border-radius:10px }
+.column h3 { font-family: var(--font-titles); color: var(--primary2); margin:0 0 12px 0 }
+.card { background:#fbfdff; padding:12px; border-radius:8px; margin-bottom:10px; box-shadow: 0 1px 0 rgba(0,0,0,0.02) }
+.card__title { font-weight:600; font-family: var(--font-span); color: var(--primary2) }
+.card__meta { font-size:13px; color: var(--gray-ultra-light); margin-top:6px }
+.badge { background: var(--input-bg); padding:4px 10px; border-radius:12px; font-size:12px }
+
+.card__head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px }
+.tag { background:#eef6ff; color:var(--primary2); padding:6px 8px; border-radius:6px; font-size:12px }
+.plate { font-size:12px; color:var(--gray-ultra-light) }
+.card__info { display:flex; justify-content:space-between; align-items:center; margin-top:10px }
+.owner { font-size:13px; color:var(--gray-ultra-light) }
+.progress { display:flex; gap:8px; align-items:center }
+.progress__bar { width:120px; height:8px; background: #eef3f7; border-radius:8px; overflow:hidden }
+.progress__bar .fill { height:100%; background: linear-gradient(90deg,var(--secondary), var(--secondary-hover)); }
+.progress__percent { font-size:12px; color:var(--gray-ultra-light) }
+
+

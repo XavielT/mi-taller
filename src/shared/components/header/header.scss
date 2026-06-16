@@ -1,0 +1,19 @@
+
+.topbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 22px;
+  border-bottom:1px solid rgba(0,0,0,0.04);
+  background: #fff;
+}
+.logo { height:40px; margin-right:12px }
+.logo-container { display:flex; align-items:center }
+.app-name { font-family: var(--font-titles); color: var(--primary2); margin-right:16px }
+.search input { padding:10px 14px; border-radius:12px; border:1px solid var(--input-bg); min-width:360px }
+.topbar__right { display:flex; gap:12px; align-items:center }
+.avatar { background:#f1f5f8; padding:6px 10px; border-radius:20px; font-family: var(--font-span) }
+
+@media (max-width: 840px) {
+  .search input { min-width: 140px }
+}

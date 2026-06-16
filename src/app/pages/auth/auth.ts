@@ -26,10 +26,11 @@ export const fadeAnimation = trigger('fadeAnimation', [
 ]);
 
 @Component({
+  standalone: true,
   selector: 'app-auth',
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './auth.html',
-  styleUrl: './auth.scss',
+  styleUrls: ['./auth.scss'],
   animations: [fadeAnimation]
 })
 export class Auth {

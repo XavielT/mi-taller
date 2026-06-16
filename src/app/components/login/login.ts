@@ -5,10 +5,11 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../shared/services/auth.service';
 
 @Component({
+  standalone: true,
   selector: 'app-login',
   imports: [CommonModule, FormsModule],
   templateUrl: './login.html',
-  styleUrl: './login.scss',
+  styleUrls: ['./login.scss'],
 })
 export class Login {
 

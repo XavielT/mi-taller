@@ -1,0 +1,25 @@
+<app-header></app-header>
+<div class="page repairs">
+  <h1>Gestión de Reparaciones</h1>
+
+  <div class="board">
+    <div class="column" *ngFor="let col of columns()">
+      <h3>{{col.title}} <span class="badge">{{col.count}}</span></h3>
+      <div class="card" *ngFor="let item of col.items">
+        <div class="card__head">
+          <div class="tag">{{item.type}}</div>
+          <div class="plate">{{item.plate}}</div>
+        </div>
+        <div class="card__title">{{item.vehicle}}</div>
+        <div class="card__meta">{{item.short}}</div>
+        <div class="card__info">
+          <div class="owner">{{item.owner}}</div>
+          <div class="progress">
+            <div class="progress__bar"><div class="fill" [style.width.%]="item.progress"></div></div>
+            <div class="progress__percent">{{item.progress}}%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

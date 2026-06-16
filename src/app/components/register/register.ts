@@ -5,10 +5,11 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../shared/services/auth.service';
 
 @Component({
+  standalone: true,
   selector: 'app-register',
   imports: [CommonModule, FormsModule],
   templateUrl: './register.html',
-  styleUrl: './register.scss',
+  styleUrls: ['./register.scss'],
 })
 export class Register {
 

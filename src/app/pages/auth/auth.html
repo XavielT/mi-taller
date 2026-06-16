@@ -34,8 +34,6 @@
         <div
             #viewContainer
             class="auth__view-container"
-            [@fadeAnimation]="getRouteState(outlet)"
-            (@fadeAnimation.done)="onRouteAnimationDone($event)"
             [style.min-height]="viewHeight">
             <router-outlet #outlet="outlet" (deactivate)="onDeactivate()"></router-outlet>
         </div>

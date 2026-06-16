@@ -1,1 +1,21 @@
-<p>navbar works!</p>
+<aside class="sidebar">
+	<div class="sidebar__brand">
+		<img src="/assets/imgs/auth/mi-taller-logo.png" alt="logo" class="sidebar__logo" />
+		<div class="sidebar__title">Workshop Manager</div>
+		<div class="sidebar__subtitle">Sucursal Norte</div>
+	</div>
+
+	<ul class="sidebar__nav">
+		<li routerLink="/home/dashboard" routerLinkActive="active">Tablero</li>
+		<li routerLink="/home/reception" routerLinkActive="active">Recepción</li>
+		<li routerLink="/home/repairs" routerLinkActive="active">Reparaciones</li>
+		<li routerLink="/home/finances" routerLinkActive="active">Finanzas</li>
+		<li routerLink="/home/inventory" routerLinkActive="active">Inventario</li>
+		<li routerLink="/home/branches" routerLinkActive="active">Sucursales</li>
+	</ul>
+
+	<div class="sidebar__actions">
+		<button class="btn btn--primary">Nuevo servicio</button>
+		<button class="btn btn--link" (click)="logout()">Cerrar sesión</button>
+	</div>
+</aside>

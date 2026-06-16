@@ -1,0 +1,54 @@
+<app-header></app-header>
+<div class="page finances">
+  <h1>Finanzas y Facturación</h1>
+
+  <section class="summary">
+    <div class="card">Ingresos diarios: <strong>{{summary()?.dailyRevenue || '$0.00'}}</strong></div>
+    <div class="card">Pagos pendientes: <strong>{{summary()?.pending || '$0.00'}}</strong></div>
+    <div class="card">Saldo vencido: <strong>{{summary()?.overdue || '$0.00'}}</strong></div>
+  </section>
+
+  <section class="invoices">
+    <div class="invoices__header">
+      <h2>Facturas</h2>
+      <div class="filters">
+        <button class="chip" [class.active]="filterStatus() === null" (click)="setFilter(null)">Todas</button>
+        <button class="chip" [class.active]="filterStatus() === 'Pagado'" (click)="setFilter('Pagado')">Pagadas</button>
+        <button class="chip" [class.active]="filterStatus() === 'Pendiente'" (click)="setFilter('Pendiente')">Pendientes</button>
+        <button class="chip" [class.active]="filterStatus() === 'Vencido'" (click)="setFilter('Vencido')">Vencidas</button>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading()" class="loading">Cargando...</div>
+
+    <table *ngIf="!isLoading()">
+      <thead>
+        <tr>
+          <th>Vehículo / Cliente</th>
+          <th>Total</th>
+          <th>Pagado</th>
+          <th>Saldo</th>
+          <th>Método</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let inv of invoices()">
+          <td>
+            <div class="vehicle">{{inv.vehicle}}</div>
+            <div class="owner">{{inv.owner}}</div>
+          </td>
+          <td>{{inv.total}}</td>
+          <td>{{inv.paid}}</td>
+          <td class="balance">{{inv.balance}}</td>
+          <td class="method">{{inv.paymentMethod || '—'}}</td>
+          <td>
+            <span class="status" [class.paid]="inv.status === 'Pagado'" [class.pending]="inv.status === 'Pendiente'" [class.overdue]="inv.status === 'Vencido'">{{inv.status}}</span>
+          </td>
+          <td class="actions">•••</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
