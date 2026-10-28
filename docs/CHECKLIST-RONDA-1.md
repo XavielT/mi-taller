@@ -10,7 +10,7 @@ Leyenda: `[x]` verificado sin base de datos (build, tests unitarios o revisión 
 - [x] Ninguna clave `service_role` en el frontend; solo la anon key en `src/environments/`.
 
 ## Antes de probar (pendiente del lado de Xaviel)
-- [ ] Ejecutar `sql/2026-10-28_001_mitaller_base.sql` en el SQL editor de X Core.
+- [x] `sql/2026-10-28_001_mitaller_base.sql` y `003_mitaller_search_path.sql` aplicadas en X Core (2026-10-28). Probadas en una transacción descartada con dos usuarios y dos talleres: aislamiento RLS, transiciones, ITBIS, pagos y anulación (20 verificaciones correctas).
 - [ ] Agregar `mitaller` en Project Settings → API → **Exposed schemas**.
 - [ ] Activar el proveedor Google y agregar las URLs de redirección (`/auth/callback`, `/auth/nueva-contrasena`) de localhost y de Vercel.
 - [ ] Revisar que las plantillas de correo de X Core no nombren otra app.
