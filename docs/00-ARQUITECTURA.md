@@ -1,0 +1,97 @@
+# 00 — Arquitectura de Mi Taller
+
+Versión 1 · 28-oct-2026 · Autor: Xaviel Terrero (con Claude)
+
+## 1. Qué es
+SaaS multi-tenant para talleres mecánicos. Un taller se registra, crea su cuenta (tenant), invita a su gente y gestiona: recepción de vehículos, órdenes de trabajo, reparaciones (tablero), facturación con ITBIS/NCF, cobros, inventario y sucursales. Mercado inicial: República Dominicana.
+
+## 2. Stack y topología
+
+```
+┌──────────────────────────────┐        ┌─────────────────────────────────────┐
+│  Angular 21 SPA (Vercel)     │  HTTPS │  Supabase "X Core" (compartido)      │
+│  signals · lazy routes       │ ─────▶ │  Postgres · schema `mitaller`        │
+│  supabase-js (anon key)      │        │  Auth (email+pass, Google)           │
+│  SCSS + CSS vars             │        │  Storage bucket `mt-ordenes`         │
+└──────────────────────────────┘        │  Edge Functions `mt-*` (futuro)      │
+                                        └─────────────────────────────────────┘
+```
+
+- **Sin SSR.** SPA pura; `/` es el login hoy (la landing pública es backlog).
+- **Schema propio `mitaller`.** Mi Taller convive con otras apps en el proyecto X Core; nada se crea en `public`. Migración futura a proyecto propio = `pg_dump --schema=mitaller` + recrear usuarios de Auth.
+- **Auth compartida.** `auth.users` es del proyecto X Core. Un usuario "es de Mi Taller" solo si tiene filas en `mitaller.miembros`. Sin membresías → `/onboarding`.
+- **Seguridad = RLS.** El frontend usa la anon key; toda tabla tiene RLS; las operaciones que cruzan tenants o necesitan privilegios (crear taller, numeración, resumen financiero) son RPCs `security definer` dentro del schema `mitaller`.
+
+## 3. Multi-tenant
+
+| Concepto | Tabla | Nota |
+|---|---|---|
+| Tenant | `talleres` | nombre, RNC, teléfono, dirección, logo, `contadores jsonb` (secuencias OT/FAC), `config jsonb` (ITBIS %, días de vencimiento) |
+| Sucursal | `sucursales` | mínimo una ("Principal") creada por `crear_taller` |
+| Membresía | `miembros` | `(taller_id, user_id)` único, `rol`, `sucursal_id` opcional, `activo` |
+| Plan | `planes` + `suscripciones` | `planes.limites jsonb` = `{ "sucursales": 1, "usuarios": 3, "ordenes_mes": 30 }`; Pro = `null` (ilimitado) |
+
+Helpers SQL (todas `stable`, `security definer`, `search_path = mitaller`):
+- `mitaller.es_miembro(p_taller uuid) returns boolean` — existe miembro activo para `auth.uid()`.
+- `mitaller.rol_en_taller(p_taller uuid) returns mitaller.rol_miembro`.
+- `mitaller.mis_talleres() returns setof talleres`.
+
+Política estándar por tabla de negocio:
+```sql
+alter table mitaller.<tabla> enable row level security;
+create policy "<tabla>_select" on mitaller.<tabla> for select using (mitaller.es_miembro(taller_id));
+create policy "<tabla>_insert" on mitaller.<tabla> for insert with check (mitaller.es_miembro(taller_id));
+create policy "<tabla>_update" on mitaller.<tabla> for update using (mitaller.es_miembro(taller_id));
+create policy "<tabla>_delete" on mitaller.<tabla> for delete using (mitaller.rol_en_taller(taller_id) in ('propietario','administrador'));
+```
+Restricciones por rol más finas (p. ej. `mecanico` no anula facturas) se aplican en políticas específicas y se duplican en la UI (ocultar botón), nunca solo en la UI.
+
+Cliente supabase-js: `createClient(url, anonKey, { db: { schema: 'mitaller' }, auth: { persistSession: true, autoRefreshToken: true } })`. El schema `mitaller` debe estar en "Exposed schemas" del proyecto.
+
+## 4. Frontend
+
+### Estado
+- `AuthService` → signals `session`, `user`, `isAuthenticated`, `loading`. Escucha `onAuthStateChange`.
+- `TallerStore` → `talleres`, `tallerActivo`, `sucursalActiva`, `rol`, `plan`, `limites`. Persiste `mt.tallerActivo` en `localStorage`. Se hidrata después del login; todos los servicios de dominio leen `tallerActivo().id` de aquí.
+- Cada página tiene su estado local con signals; nada de NgRx.
+
+### Rutas
+```
+/                      Auth shell → redirect login
+/login  /register      (redirigen a /home si hay sesión)
+/auth/callback         OAuth Google
+/auth/recuperar  /auth/nueva-contrasena
+/onboarding            authGuard · crea el taller
+/home                  authGuard + tallerGuard · shell (navbar + header + footer)
+  /home/dashboard
+  /home/recepcion              recibir vehículo
+  /home/recepcion/clientes     lista / detalle
+  /home/ordenes/:id            detalle OT
+  /home/reparaciones           kanban
+  /home/finanzas               facturas + pagos
+  /home/finanzas/facturas/:id  detalle + imprimir
+  /home/inventario             (placeholder esta ronda)
+  /home/sucursales             (placeholder esta ronda)
+```
+
+### Capas
+`page` (ruta, orquesta) → `components` (presentación) → `services/<dominio>.service.ts` (llama a Supabase, devuelve tipos de `models/`) → `SupabaseService`.
+Errores: los servicios lanzan `Error` con mensaje en español; las páginas los muestran con `mt-toast`.
+
+### UI
+Paleta y fuentes de `styles.scss` (navy `--primary #002547`, naranja `--secondary #fc9d33`, fondo `--bg #f7fafc`). Componentes `mt-*` en `shared/ui`, cada uno con su SCSS usando solo variables. Responsive desde 360 px; navbar colapsa a drawer bajo 900 px.
+
+## 5. Numeración y dinero
+- Secuencias por taller: `mitaller.siguiente_numero(p_taller uuid, p_tipo text) returns text` — hace `update talleres set contadores = ...` con `for update`, devuelve `OT-000012` / `FAC-000007`.
+- Montos `numeric(12,2)`; ITBIS por ítem (`aplica_itbis boolean`), tasa en `talleres.config->>'itbis'` (default 18). Totales de orden y factura se calculan en vistas (`ordenes_resumen`, `facturas_resumen`) para que la verdad esté en la DB.
+
+## 6. Entornos
+- `environment.development.ts` → X Core (dev). `environment.ts` → X Core (prod) hasta tener proyecto propio.
+- Variables: `supabaseUrl`, `supabaseAnonKey`, `supabaseSchema`, `appName`, `appUrl`.
+- Deploy: Vercel, `vercel.json` con rewrite `{"source":"/(.*)","destination":"/index.html"}`.
+
+## 7. Defaults vigentes (aplicar sin preguntar)
+- Login social: solo Google. ITBIS 18 %. Vencimiento factura 30 días. Plan Gratis: 1 sucursal / 3 usuarios / 30 OT por mes. Un usuario puede estar en varios talleres. Estados de OT y factura: ver `CLAUDE.md`. Kanban con HTML5 drag & drop nativo. PDF de factura = vista imprimible (`@media print`).
+
+## 8. Backlog arquitectónico
+Inventario con descuento automático · sucursales múltiples en UI · citas y recordatorios · cotizaciones con aprobación por link · NCF automáticos y 606/607/e-CF · cobro de planes · landing pública · portal del cliente · PWA para mecánicos · migración a proyecto Supabase propio.
