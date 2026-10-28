@@ -1,0 +1,97 @@
+<div class="mt-page finances">
+  <mt-page-header title="Finanzas y facturación" subtitle="Cobros, facturas y saldos pendientes de tu taller." />
+
+  @if (error(); as msg) {
+    <div class="mt-error" role="alert">{{ msg }}</div>
+  }
+
+  <section class="summary" aria-label="Resumen">
+    <div class="mt-card kpi">
+      <span class="kpi__label">Ingresos de hoy</span>
+      <strong>{{ (resumen()?.ingresos_hoy ?? 0) | currency }}</strong>
+    </div>
+    <div class="mt-card kpi">
+      <span class="kpi__label">Pendiente de cobro</span>
+      <strong>{{ (resumen()?.pendiente_cobro ?? 0) | currency }}</strong>
+    </div>
+    <div class="mt-card kpi kpi--alerta">
+      <span class="kpi__label">Vencido</span>
+      <strong>{{ (resumen()?.vencido ?? 0) | currency }}</strong>
+    </div>
+    <div class="mt-card kpi">
+      <span class="kpi__label">Ticket promedio del mes</span>
+      <strong>{{ (resumen()?.ticket_promedio ?? 0) | currency }}</strong>
+    </div>
+  </section>
+
+  <section class="invoices">
+    <div class="mt-toolbar">
+      <div class="filters" role="group" aria-label="Filtrar por estado">
+        @for (c of chips; track c.valor) {
+          <button type="button" class="chip" [class.active]="estado() === c.valor" (click)="elegirEstado(c.valor)">{{ c.etiqueta }}</button>
+        }
+      </div>
+    </div>
+
+    <div class="mt-toolbar">
+      <input
+        class="mt-search"
+        type="search"
+        placeholder="Buscar por número, cliente o placa..."
+        aria-label="Buscar facturas"
+        [value]="busqueda()"
+        (input)="busqueda.set($any($event.target).value)"
+      />
+      <label class="fecha">Desde <input type="date" [ngModel]="desde()" (ngModelChange)="desde.set($event); cambiarFechas()" /></label>
+      <label class="fecha">Hasta <input type="date" [ngModel]="hasta()" (ngModelChange)="hasta.set($event); cambiarFechas()" /></label>
+    </div>
+
+    <mt-table [columns]="columnas" [rows]="facturas()" [loading]="cargando()">
+      <ng-template mtCell="numero" let-row>
+        <a class="mt-link" [routerLink]="['/home/finanzas/facturas', row.id]">{{ row.numero }}</a>
+      </ng-template>
+      <ng-template mtCell="cliente" let-row>
+        <div>{{ row.cliente_nombre }}</div>
+        <div class="mt-muted">{{ row.vehiculo_placa || '—' }}</div>
+      </ng-template>
+      <ng-template mtCell="fecha_emision" let-row>{{ row.fecha_emision | date: 'dd/MM/yyyy' }}</ng-template>
+      <ng-template mtCell="total" let-row>{{ row.total | currency }}</ng-template>
+      <ng-template mtCell="pagado" let-row>{{ row.pagado | currency }}</ng-template>
+      <ng-template mtCell="balance" let-row><strong>{{ row.balance | currency }}</strong></ng-template>
+      <ng-template mtCell="estado" let-row><mt-badge-estado [estado]="row.estado_efectivo" /></ng-template>
+      <ng-template mtCell="acciones" let-row>
+        <div class="acciones">
+          <a class="mt-link" [routerLink]="['/home/finanzas/facturas', row.id]">Ver</a>
+          @if (puedeCobrar(row)) {
+            <mt-button size="sm" (click)="pagando.set(row)">Registrar pago</mt-button>
+          }
+          @if (puedeAnularFactura(row)) {
+            <mt-button size="sm" variant="ghost" (click)="anulando.set(row)">Anular</mt-button>
+          }
+        </div>
+      </ng-template>
+      <div empty>
+        <mt-empty-state
+          [title]="estado() === 'todas' && !busqueda() ? 'Aún no hay facturas' : 'Sin resultados'"
+          [text]="estado() === 'todas' && !busqueda() ? 'Cuando una orden esté lista podrás facturarla desde su detalle.' : 'Prueba con otro filtro o rango de fechas.'"
+        >
+          @if (estado() === 'todas' && !busqueda()) {
+            <a class="mt-link" routerLink="/home/reparaciones">Ir a reparaciones</a>
+          }
+        </mt-empty-state>
+      </div>
+    </mt-table>
+  </section>
+</div>
+
+<mt-modal [open]="pagando() !== null" [title]="'Registrar pago · ' + (pagando()?.numero ?? '')" size="sm" (closed)="pagando.set(null)">
+  @if (pagando(); as f) {
+    <app-pago-form [facturaId]="f.id" [balance]="f.balance" (registrado)="tras('Pago registrado')" (cancelado)="pagando.set(null)" />
+  }
+</mt-modal>
+
+<mt-modal [open]="anulando() !== null" [title]="'Anular factura · ' + (anulando()?.numero ?? '')" size="sm" (closed)="anulando.set(null)">
+  @if (anulando(); as f) {
+    <app-anular-form [facturaId]="f.id" (anulada)="tras('Factura anulada')" (cancelado)="anulando.set(null)" />
+  }
+</mt-modal>

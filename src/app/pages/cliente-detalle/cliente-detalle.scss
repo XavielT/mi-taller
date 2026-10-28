@@ -1,0 +1,57 @@
+.datos dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+}
+
+.datos dt {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.datos dd {
+  margin: 0.15rem 0 0;
+}
+
+.datos__notas {
+  grid-column: 1 / -1;
+}
+
+.seccion {
+  margin-top: 1.75rem;
+}
+
+.seccion__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+
+  h2 {
+    margin: 0;
+    font-family: var(--font-titles);
+    color: var(--primary);
+    font-size: 1.2rem;
+  }
+}
+
+.vehiculos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+.vehiculo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-start;
+}
+
+.vehiculo__placa {
+  font-family: var(--font-titles);
+  font-size: 1.15rem;
+  color: var(--primary);
+}

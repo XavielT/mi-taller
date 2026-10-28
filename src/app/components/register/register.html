@@ -1,120 +1,54 @@
 <div class="register">
     <div class="register__title">
         <h2>Crea tu cuenta</h2>
-        <span>Unete a la red de talleres mas eficientes.</span>
+        <span>Únete a la red de talleres más eficientes.</span>
     </div>
 
-    <form class="register__form" #registerForm="ngForm" (ngSubmit)="onRegisterSubmit(registerForm)">
+    <form class="register__form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
         <div class="register__form-group">
-            <label>Nombre Completo</label>
-            <div class="register__form-input-container">
-                <img class="register__form-input-icon" src="assets/icons/person-icon.svg" alt="Person icon" />
-                <input class="register__form-input" type="text" id="name" name="name" placeholder="Ej: Juan Perez"
-                    required ngModel #name="ngModel" minlength="4" />
-            </div>
-
-            <!-- error cases -->
-            <span class="register__input-error" *ngIf="name.invalid && (name.touched || registerForm.submitted)">
-
-                <span *ngIf="name.errors?.['required']">
-                    El nombre es requerido
-                </span>
-
-                <span *ngIf="name.errors?.['minlength']">
-                    Ingresa un nombre valido (Un nombre mas largo)
-                </span>
-
-            </span>
+            <mt-input label="Nombre completo" placeholder="Ej: Juan Pérez"
+                icon="assets/icons/person-icon.svg" formControlName="name" />
         </div>
         <div class="register__form-group">
-            <label>Nombre del taller</label>
-            <div class="register__form-input-container">
-                <img class="register__form-input-icon" src="assets/icons/company-icon.svg" alt="company icon" />
-                <input class="register__form-input" type="text" id="company" name="company" placeholder="Ej: X AutoHub"
-                    required ngModel #company="ngModel" minlength="2" />
-            </div>
-
-            <!-- error cases -->
-            <span class="register__input-error" *ngIf="company.invalid && (company.touched || registerForm.submitted)">
-
-                <span *ngIf="company.errors?.['required']">
-                    El nombre del taller es requerido
-                </span>
-
-                <span *ngIf="company.errors?.['minlength']">
-                    Ingresa un nombre valido (Un nombre mas largo)
-                </span>
-
-            </span>
+            <mt-input label="Nombre del taller" placeholder="Ej: X AutoHub"
+                icon="assets/icons/company-icon.svg" formControlName="company" />
         </div>
         <div class="register__form-group">
-            <label>Correo electronico</label>
-            <div class="register__form-input-container">
-                <img class="register__form-input-icon" src="assets/icons/email-icon.svg" alt="Email icon" />
-                <input class="register__form-input" type="email" id="email" name="email" placeholder="ejemplo@correo.com"
-                    required ngModel #email="ngModel" minlength="8" />
-            </div>
-
-            <!-- error cases -->
-            <span class="register__input-error" *ngIf="email.invalid && (email.touched || registerForm.submitted)">
-
-                <span *ngIf="email.errors?.['required']">
-                    El correro es requerido
-                </span>
-
-                <span *ngIf="email.errors?.['email']">
-                    Ingresa un correo valido
-                </span>
-
-            </span>
+            <mt-input label="Correo electrónico" type="email" placeholder="ejemplo@correo.com"
+                icon="assets/icons/email-icon.svg" formControlName="email" />
         </div>
         <div class="register__form-group">
-            <div class="register__form-group-title">
-                <label>Contraseña</label>
-            </div>
-            <div class="register__form-input-container">
-                <img class="register__form-input-icon" src="assets/icons/lock-icon.svg" alt="Lock icon" />
-                <input class="register__form-input" type="password" id="password" name="password"
-                    placeholder="Ingresa tu contraseña" required ngModel #password="ngModel" minlength="6" />
-            </div>
+            <mt-input label="Contraseña" type="password" placeholder="Ingresa tu contraseña"
+                icon="assets/icons/lock-icon.svg" formControlName="password" />
         </div>
 
-        <button class="register__submit-btn" type="submit" [disabled]="isLoading">
-            <span *ngIf="!isLoading">Crear Cuenta</span>
-            <span *ngIf="isLoading" class="register__submit-btn-sending">
-                <span class="spinner"></span>
-                Creando la cuenta...
-            </span>
-        </button>
+        <mt-button class="register__submit" type="submit" size="lg" [loading]="isLoading()">
+            {{ isLoading() ? 'Creando la cuenta...' : 'Crear Cuenta' }}
+        </mt-button>
+
+        @if (error(); as msg) {
+            <div class="form-message">
+                <div class="message error-message">
+                    <span class="message-icon">⚠</span>
+                    <div class="message-text">
+                        <strong>Algo ha salido mal</strong>
+                        <p>{{ msg }}</p>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (success()) {
+            <div class="form-message">
+                <div class="message success-message">
+                    <span class="message-icon">✓</span>
+                    <div class="message-text">
+                        <strong>¡Cuenta creada!</strong>
+                        <p>Revisa tu correo para confirmar la cuenta y luego inicia sesión.</p>
+                    </div>
+                </div>
+            </div>
+        }
     </form>
-
-    <div *ngIf="errorMessage" class="form-message">
-
-        <div *ngIf="errorMessage === 'success'" class="message success-message">
-            <span class="message-icon">✓</span>
-            <div class="message-text">
-                <strong>Cuenta Creada!</strong>
-                <p>Ya puedes ingresar a la plataforma.</p>
-            </div>
-        </div>
-
-        <div *ngIf="errorMessage === 'error'" class="message error-message">
-            <span class="message-icon">⚠</span>
-            <div class="message-text">
-                <strong>Algo ha salido mal</strong>
-                <p>{{ errorMessage }}</p>
-            </div>
-        </div>
-
-        <!--<div *ngIf="messageStatus === 'rateLimit'" class="message rate-limit-message">
-            <span class="message-icon">⏱</span>
-            <div class="message-text">
-                <strong>Please wait</strong>
-                <p>You can send another message in a few seconds.</p>
-            </div>
-        </div>-->
-
-    </div>
 
     <div class="register__divider">
         <div class="register__divider-line"></div>
@@ -122,7 +56,6 @@
         <div class="register__divider-line"></div>
     </div>
     <div class="register__ways">
-        <a><img src="assets/icons/google-icon.svg"/> Google</a>
-        <a><img src="assets/icons/facebook-icon.svg"/> Facebook</a>
+        <button type="button" (click)="google()"><img src="assets/icons/google-icon.svg" alt="" /> Google</button>
     </div>
 </div>

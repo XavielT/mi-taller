@@ -1,0 +1,97 @@
+<div class="mt-page">
+  <mt-page-header title="Tablero" subtitle="El pulso de tu taller de un vistazo." />
+
+  @if (cargando()) {
+    <p class="mt-muted">Cargando...</p>
+  } @else if (error(); as msg) {
+    <div class="mt-error" role="alert">{{ msg }}</div>
+  } @else if (resumen(); as r) {
+    @if (vacio()) {
+      <div class="mt-card">
+        <mt-empty-state title="Tu taller está listo" text="Todavía no has recibido vehículos. Registra el primero y aquí verás el movimiento del día.">
+          <a class="cta" routerLink="/home/recepcion">Recibir mi primer vehículo</a>
+        </mt-empty-state>
+      </div>
+    } @else {
+      <section class="kpis" aria-label="Indicadores">
+        <a class="mt-card kpi" routerLink="/home/reparaciones">
+          <span class="kpi__label">Vehículos en taller</span>
+          <strong>{{ r.abiertas }}</strong>
+        </a>
+        <a class="mt-card kpi kpi--ok" routerLink="/home/reparaciones">
+          <span class="kpi__label">Listos para entrega</span>
+          <strong>{{ r.listas }}</strong>
+        </a>
+        <a class="mt-card kpi kpi--alerta" routerLink="/home/finanzas">
+          <span class="kpi__label">Facturas vencidas</span>
+          <strong>{{ r.facturas_vencidas.cantidad }}</strong>
+          <span class="kpi__sub">{{ r.facturas_vencidas.monto | currency }}</span>
+        </a>
+        <a class="mt-card kpi" routerLink="/home/finanzas">
+          <span class="kpi__label">Ingresos del mes</span>
+          <strong>{{ (finanzas()?.ingresos_mes ?? 0) | currency }}</strong>
+          @if (variacion(); as v) {
+            <span class="kpi__sub" [class.sube]="v >= 0" [class.baja]="v < 0">{{ v >= 0 ? '▲' : '▼' }} {{ v < 0 ? -v : v }}% vs mes anterior</span>
+          } @else {
+            <span class="kpi__sub">Sin mes anterior para comparar</span>
+          }
+        </a>
+      </section>
+
+      <div class="columnas">
+        <section class="mt-card">
+          <h2>Órdenes por estado</h2>
+          <ul class="barras">
+            @for (e of estados(); track e.estado) {
+              <li>
+                <span class="barras__label">{{ etiqueta[e.estado] }}</span>
+                <span class="barras__pista"><span class="barras__fill" [style.width.%]="e.pct"></span></span>
+                <strong class="barras__n">{{ e.n }}</strong>
+              </li>
+            }
+          </ul>
+        </section>
+
+        <section class="mt-card">
+          <h2>Carga por mecánico</h2>
+          @if (r.carga_mecanicos.length === 0) {
+            <p class="mt-muted">Aún no hay órdenes abiertas asignadas a mecánicos.</p>
+          } @else {
+            <ul class="barras">
+              @for (m of r.carga_mecanicos; track m.mecanico_id) {
+                <li>
+                  <span class="barras__label">{{ m.nombre }}</span>
+                  <span class="barras__pista"><span class="barras__fill barras__fill--sec" [style.width.%]="(m.ordenes / maxCarga()) * 100"></span></span>
+                  <strong class="barras__n">{{ m.ordenes }}</strong>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      </div>
+
+      <section class="mt-card ultimas">
+        <h2>Últimas órdenes</h2>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr><th>Orden</th><th>Vehículo</th><th>Cliente</th><th>Estado</th><th>Entrada</th><th class="num">Total</th></tr>
+            </thead>
+            <tbody>
+              @for (o of r.ultimas_ordenes; track o.id) {
+                <tr>
+                  <td><a class="mt-link" [routerLink]="['/home/ordenes', o.id]">{{ o.numero }}</a></td>
+                  <td>{{ o.vehiculo_placa }} · {{ o.vehiculo_marca }} {{ o.vehiculo_modelo }}</td>
+                  <td>{{ o.cliente_nombre }}</td>
+                  <td><mt-badge-estado [estado]="o.estado" /></td>
+                  <td>{{ o.fecha_entrada | date: 'dd/MM/yyyy' }}</td>
+                  <td class="num">{{ o.total | currency }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+  }
+</div>

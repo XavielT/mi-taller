@@ -1,5 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject, output, signal } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
+
+/** Up to two initials from the user's name, falling back to the first letter of the email. */
+export function iniciales(name?: string | null, email?: string | null): string {
+  const fromName = (name ?? '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join('');
+  return (fromName || (email ?? '?')[0]).toUpperCase();
+}
 
 @Component({
   standalone: true,
@@ -9,10 +21,17 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./header.scss'],
 })
 export class Header {
-  constructor(private auth: AuthService) {}
+  private auth = inject(AuthService);
 
-  // expose current user via getter to avoid using `auth` before initialization
-  get user() {
-    return this.auth.currentUser;
+  menuToggle = output<void>();
+  menuAbierto = signal(false);
+
+  readonly initials = computed(() => {
+    return iniciales(this.auth.nombreUsuario(), this.auth.user()?.email);
+  });
+
+  logout(): void {
+    this.menuAbierto.set(false);
+    void this.auth.signOut();
   }
 }

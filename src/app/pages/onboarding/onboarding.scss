@@ -1,0 +1,67 @@
+.onboarding {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  background: var(--bg);
+
+  &__card {
+    width: 100%;
+    max-width: 28rem;
+    padding: 2rem 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--borders);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    box-sizing: border-box;
+
+    h1 {
+      margin: 0.5rem 0 0.25rem;
+      font-family: var(--font-titles);
+      color: var(--primary);
+      font-size: 1.6rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    mt-button {
+      display: block;
+      margin-top: 0.5rem;
+    }
+  }
+
+  &__logo {
+    width: 3.5rem;
+    border-radius: 8px;
+  }
+
+  &__sub {
+    margin: 0 0 1.25rem;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+  }
+
+  &__error {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    background: var(--error-container);
+    color: var(--alert);
+    font-family: var(--font-span);
+    font-size: 0.9rem;
+  }
+
+  &__link {
+    display: block;
+    margin: 1rem auto 0;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: var(--font-span);
+  }
+}

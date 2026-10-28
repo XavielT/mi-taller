@@ -1,0 +1,281 @@
+.orden {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+h1 {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-titles);
+  color: var(--primary);
+}
+
+h2 {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-titles);
+  color: var(--primary);
+  font-size: 1.15rem;
+}
+
+.cabecera__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.boton-link {
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius);
+  background: var(--secondary);
+  color: var(--titles);
+  font-family: var(--font-btns);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--secondary-hover);
+  }
+}
+
+.datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0 0;
+
+  dt {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  dd {
+    margin: 0.15rem 0 0;
+  }
+}
+
+.progreso {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 1.25rem;
+  max-width: 24rem;
+}
+
+.motivo {
+  margin: 1rem 0 0.25rem;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.seccion__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* items table scrolls horizontally on small screens */
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+.items {
+  width: 100%;
+  min-width: 42rem;
+  border-collapse: collapse;
+
+  th {
+    padding: 0.5rem;
+    text-align: left;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--borders);
+  }
+
+  td {
+    padding: 0.4rem 0.5rem;
+    border-bottom: 1px solid var(--borders);
+  }
+
+  .num {
+    text-align: right;
+  }
+}
+
+.celda,
+.items select,
+.nuevo-item input,
+.nuevo-item select {
+  height: 2.25rem;
+  padding: 0 0.6rem;
+  box-sizing: border-box;
+  border: 1px solid var(--borders);
+  border-radius: 8px;
+  background: var(--surface);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}
+
+.celda {
+  width: 100%;
+}
+
+.celda--num {
+  width: 6.5rem;
+  text-align: right;
+}
+
+.vacio {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 1rem;
+}
+
+.quitar {
+  width: 1.8rem;
+  height: 1.8rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--error-container);
+  color: var(--alert);
+  cursor: pointer;
+}
+
+.nuevo-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+
+  input[type='text'] {
+    flex: 1 1 12rem;
+  }
+
+  input[type='number'] {
+    width: 6.5rem;
+  }
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.totales {
+  margin: 1.25rem 0 0 auto;
+  max-width: 20rem;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.2rem 0;
+  }
+
+  dt,
+  dd {
+    margin: 0;
+  }
+}
+
+.totales__total {
+  border-top: 1px solid var(--borders);
+  margin-top: 0.25rem;
+  padding-top: 0.5rem !important;
+  font-family: var(--font-titles);
+  font-size: 1.15rem;
+  color: var(--primary);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  label {
+    font-family: var(--font-label);
+    font-size: 0.95rem;
+  }
+
+  textarea {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--borders);
+    border-radius: 12px;
+    background: var(--surface);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    resize: vertical;
+  }
+}
+
+.subir {
+  position: relative;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--borders);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--primary);
+  font-family: var(--font-btns);
+  cursor: pointer;
+  overflow: hidden;
+
+  input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+}
+
+.galeria {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  gap: 0.6rem;
+
+  img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--borders);
+  }
+}
+
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 1.1rem;
+  border-left: 2px solid var(--borders);
+
+  li {
+    position: relative;
+    padding: 0 0 1rem 0.9rem;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -1.45rem;
+      top: 0.3rem;
+      width: 0.7rem;
+      height: 0.7rem;
+      border-radius: 50%;
+      background: var(--secondary);
+    }
+
+    p {
+      margin: 0.3rem 0 0;
+    }
+  }
+}

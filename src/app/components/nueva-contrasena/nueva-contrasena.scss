@@ -1,0 +1,4 @@
+@use '../../../styles/auth-form' as *;
+
+@include auth-form('nueva');
+@include auth-form-feedback('nueva');

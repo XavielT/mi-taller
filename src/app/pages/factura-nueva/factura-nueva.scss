@@ -1,0 +1,67 @@
+.vista {
+  margin-bottom: 1.25rem;
+}
+
+.vista__datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  min-width: 28rem;
+  border-collapse: collapse;
+
+  th {
+    padding: 0.5rem;
+    text-align: left;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--borders);
+  }
+
+  td {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--borders);
+  }
+
+  .num {
+    text-align: right;
+  }
+}
+
+.vacio {
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.totales {
+  margin: 1rem 0 0.5rem auto;
+  max-width: 18rem;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.2rem 0;
+  }
+
+  dt,
+  dd {
+    margin: 0;
+  }
+}
+
+.totales__total {
+  border-top: 1px solid var(--borders);
+  padding-top: 0.5rem !important;
+  font-family: var(--font-titles);
+  font-size: 1.15rem;
+  color: var(--primary);
+}

@@ -1,14 +1,11 @@
-import { inject } from "@angular/core";
-import { CanActivateFn, Router } from "@angular/router";
-import { AuthService } from "../services/auth.service";
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
-export const authGuard: CanActivateFn = () => {
-    const authService = inject(AuthService);
-    const router = inject(Router);
-
-    if (authService.isAuthenticated()) {
-        return true;
-    }
-
-    return router.createUrlTree(['/'])
-}
+/** Waits for the initial session check, then sends anonymous users to /login. */
+export const authGuard: CanActivateFn = async () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  await auth.whenReady();
+  return auth.isAuthenticated() ? true : router.createUrlTree(['/login']);
+};

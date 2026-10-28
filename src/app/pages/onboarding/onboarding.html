@@ -1,0 +1,24 @@
+<div class="onboarding">
+    <div class="onboarding__card">
+        <img class="onboarding__logo" src="assets/imgs/auth/mi-taller-logo.png" alt="Mi Taller" />
+        <h1>Configura tu taller</h1>
+        <p class="onboarding__sub">Solo te tomará un minuto. Podrás cambiar estos datos después.</p>
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+            <mt-input label="Nombre del taller" placeholder="Ej: X AutoHub" formControlName="nombre" />
+            <mt-input label="RNC (opcional)" placeholder="9 u 11 dígitos" hint="Solo números, sin guiones" formControlName="rnc" />
+            <mt-input label="Teléfono" type="tel" placeholder="809-000-0000" formControlName="telefono" />
+            <mt-input label="Dirección" placeholder="Calle, sector, ciudad" formControlName="direccion" />
+
+            @if (error(); as msg) {
+                <div class="onboarding__error" role="alert">{{ msg }}</div>
+            }
+
+            <mt-button type="submit" size="lg" [loading]="isLoading()">
+                {{ isLoading() ? 'Creando taller...' : 'Crear mi taller' }}
+            </mt-button>
+        </form>
+
+        <button type="button" class="onboarding__link" (click)="cerrarSesion()">Cerrar sesión</button>
+    </div>
+</div>

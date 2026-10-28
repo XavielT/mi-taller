@@ -1,0 +1,75 @@
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  strong {
+    font-family: var(--font-titles);
+    font-size: 1.5rem;
+    color: var(--primary);
+  }
+}
+
+.kpi__label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.kpi--alerta strong {
+  color: var(--alert);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--borders);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-span);
+  cursor: pointer;
+
+  &.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--titles);
+  }
+}
+
+.fecha {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-span);
+  color: var(--text-muted);
+
+  input {
+    height: 2.5rem;
+    padding: 0 0.6rem;
+    border: 1px solid var(--borders);
+    border-radius: 12px;
+    background: var(--surface);
+    font-family: var(--font-body);
+  }
+}
+
+.acciones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}

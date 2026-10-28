@@ -10,17 +10,17 @@
 }
 
 .sidebar__brand {
-	display:flex;
-	align-items:center;
-	gap:12px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
 	margin-bottom: 20px;
 }
 
 .sidebar__logo {
-	width:44px;
-	height:44px;
-	border-radius:8px;
-	object-fit:cover;
+	width: 44px;
+	height: 44px;
+	border-radius: 8px;
+	object-fit: cover;
 }
 
 .sidebar__title {
@@ -32,42 +32,44 @@
 .sidebar__subtitle {
 	font-family: var(--font-subtitles);
 	font-size: 12px;
-	color: rgba(255,255,255,0.85);
+	color: rgba(255, 255, 255, 0.85);
 }
 
 .sidebar__nav {
-	list-style:none;
-	padding:0;
+	list-style: none;
+	padding: 0;
 	margin: 8px 0 0 0;
-	display:flex;
-	flex-direction:column;
-	gap:8px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
 }
 
-.sidebar__nav li {
-	padding:10px 12px;
-	border-radius:8px;
-	cursor:pointer;
-	color: rgba(255,255,255,0.95);
+.sidebar__nav a {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 12px;
+	border-radius: 8px;
+	color: rgba(255, 255, 255, 0.95);
 	font-family: var(--font-span);
+	text-decoration: none;
 }
 
-.sidebar__nav li.active,
-.sidebar__nav li:hover {
-	background: rgba(255,255,255,0.06);
+.sidebar__nav a:hover {
+	background: rgba(255, 255, 255, 0.06);
 }
 
-/* make active look like the orange highlight from the design */
-.sidebar__nav li.active {
+/* active item keeps the orange highlight from the design */
+.sidebar__nav a.active {
 	background: var(--secondary);
 	color: #fff;
 }
 
 .sidebar__actions {
 	margin-top: auto;
-	display:flex;
-	flex-direction:column;
-	gap:8px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
 }
 
 .btn {
@@ -75,14 +77,39 @@
 	padding: 10px 12px;
 	border-radius: 10px;
 	font-family: var(--font-btns);
-}
-
-.btn--primary {
-	background: var(--secondary);
-	color: #fff;
+	cursor: pointer;
 }
 
 .btn--link {
 	background: transparent;
-	color: rgba(255,255,255,0.9);
+	color: rgba(255, 255, 255, 0.9);
+}
+
+.sidebar-backdrop {
+	display: none;
+}
+
+/* off-canvas drawer under 900px */
+@media (max-width: 899px) {
+	.sidebar {
+		position: fixed;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		z-index: 900;
+		transform: translateX(-100%);
+		transition: transform 0.25s ease;
+	}
+
+	.sidebar--open {
+		transform: translateX(0);
+	}
+
+	.sidebar-backdrop {
+		display: block;
+		position: fixed;
+		inset: 0;
+		z-index: 899;
+		background: rgba(0, 37, 71, 0.5);
+	}
 }

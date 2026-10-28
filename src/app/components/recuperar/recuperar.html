@@ -1,0 +1,36 @@
+<div class="recuperar">
+    <div class="recuperar__title">
+        <h2>Recupera tu contraseña</h2>
+        <span>Te enviaremos un enlace para crear una nueva.</span>
+    </div>
+
+    <form class="recuperar__form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="recuperar__form-group">
+            <mt-input label="Correo electrónico" type="email" placeholder="ejemplo@correo.com"
+                icon="assets/icons/email-icon.svg" formControlName="email" />
+        </div>
+
+        <mt-button class="recuperar__submit" type="submit" size="lg" [loading]="isLoading()">
+            {{ isLoading() ? 'Enviando...' : 'Enviar enlace' }}
+        </mt-button>
+
+        @if (error(); as msg) {
+            <div class="form-message">
+                <div class="message error-message">
+                    <span class="message-icon">⚠</span>
+                    <div class="message-text"><p>{{ msg }}</p></div>
+                </div>
+            </div>
+        }
+        @if (enviado()) {
+            <div class="form-message">
+                <div class="message success-message">
+                    <span class="message-icon">✓</span>
+                    <div class="message-text"><p>Si el correo existe, recibirás un enlace.</p></div>
+                </div>
+            </div>
+        }
+    </form>
+
+    <div class="recuperar__form-group-title"><a routerLink="/login">Volver a iniciar sesión</a></div>
+</div>

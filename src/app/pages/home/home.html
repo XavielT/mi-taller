@@ -1,6 +1,6 @@
-<app-navbar></app-navbar>
+<app-navbar [tallerNombre]="store.tallerActivo()?.nombre ?? 'Mi Taller'" [sucursalNombre]="store.sucursalActiva()?.nombre ?? 'Sucursal Principal'" [open]="menuAbierto()" (closed)="menuAbierto.set(false)"></app-navbar>
 <main class="app-main">
-	<app-header></app-header>
+	<app-header (menuToggle)="menuAbierto.set(!menuAbierto())"></app-header>
 	<section class="app-content">
 		<router-outlet></router-outlet>
 	</section>

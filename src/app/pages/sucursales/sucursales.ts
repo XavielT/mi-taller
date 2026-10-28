@@ -1,8 +1,20 @@
 import { Component } from '@angular/core';
+import { MtEmptyState, MtPageHeader } from '../../../shared/ui';
 
 @Component({
   standalone: true,
-  selector: 'app-branches',
-  template: `<div class="page"><h2>Sucursales</h2><p>Administración de sucursales.</p></div>`,
+  selector: 'app-sucursales',
+  imports: [MtEmptyState, MtPageHeader],
+  template: `
+    <div class="mt-page">
+      <mt-page-header title="Sucursales" />
+      <div class="mt-card">
+        <mt-empty-state
+          title="Disponible próximamente"
+          text="Podrás administrar varias sucursales, sus equipos y sus órdenes desde un solo lugar."
+        />
+      </div>
+    </div>
+  `,
 })
-export class Branches {}
+export class Sucursales {}

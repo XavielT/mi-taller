@@ -1,25 +1,103 @@
-<app-header></app-header>
-<div class="page repairs">
-  <h1>Gestión de Reparaciones</h1>
+<div class="mt-page repairs">
+  <mt-page-header title="Reparaciones" subtitle="Arrastra las tarjetas entre columnas o usa las flechas para avanzar una orden.">
+    <a class="mt-link" routerLink="/home/recepcion">Recibir vehículo</a>
+  </mt-page-header>
 
-  <div class="board">
-    <div class="column" *ngFor="let col of columns()">
-      <h3>{{col.title}} <span class="badge">{{col.count}}</span></h3>
-      <div class="card" *ngFor="let item of col.items">
-        <div class="card__head">
-          <div class="tag">{{item.type}}</div>
-          <div class="plate">{{item.plate}}</div>
-        </div>
-        <div class="card__title">{{item.vehicle}}</div>
-        <div class="card__meta">{{item.short}}</div>
-        <div class="card__info">
-          <div class="owner">{{item.owner}}</div>
-          <div class="progress">
-            <div class="progress__bar"><div class="fill" [style.width.%]="item.progress"></div></div>
-            <div class="progress__percent">{{item.progress}}%</div>
-          </div>
-        </div>
-      </div>
+  <div class="mt-toolbar">
+    <input
+      class="mt-search"
+      type="search"
+      placeholder="Buscar por placa o número de orden..."
+      aria-label="Buscar órdenes"
+      [value]="busqueda()"
+      (input)="busqueda.set($any($event.target).value)"
+    />
+    <div class="filtro">
+      <mt-select
+        placeholder="Todos los mecánicos"
+        [options]="mecanicos()"
+        [ngModel]="filtroMecanico()"
+        (ngModelChange)="filtroMecanico.set($event)"
+      />
     </div>
+    <mt-button variant="ghost" (click)="alternarCerradas()">{{ verCerradas() ? 'Ocultar cerradas' : 'Ver cerradas' }}</mt-button>
   </div>
+
+  @if (cargando()) {
+    <p class="mt-muted">Cargando tablero...</p>
+  } @else {
+    <div class="board">
+      @for (col of columnas; track col) {
+        <section
+          class="column"
+          [class.sobre]="columnaSobre() === col"
+          [attr.aria-label]="etiqueta[col]"
+          (dragover)="sobreColumna($event, col)"
+          (dragleave)="columnaSobre.set(null)"
+          (drop)="soltar($event, col)"
+        >
+          <h3>{{ etiqueta[col] }} <span class="badge">{{ porColumna()[col].length }}</span></h3>
+
+          @for (o of porColumna()[col]; track o.id) {
+            <article
+              class="card"
+              [class.arrastrando]="arrastrando() === o.id"
+              draggable="true"
+              (dragstart)="iniciarArrastre($event, o)"
+              (dragend)="terminarArrastre()"
+            >
+              <div class="card__head">
+                <a class="mt-link" [routerLink]="['/home/ordenes', o.id]">{{ o.numero }}</a>
+                <span class="plate">{{ o.vehiculo_placa }}</span>
+              </div>
+              <div class="card__title">{{ o.vehiculo_marca }} {{ o.vehiculo_modelo }} {{ o.vehiculo_anio }}</div>
+              <div class="card__meta">{{ o.cliente_nombre }}</div>
+              <div class="card__info">
+                @if (o.mecanico_nombre) {
+                  <span class="chip" [title]="o.mecanico_nombre">{{ iniciales(o.mecanico_nombre) }}</span>
+                } @else {
+                  <span class="mt-muted">Sin asignar</span>
+                }
+                <span class="mt-muted">{{ dias(o) }} {{ dias(o) === 1 ? 'día' : 'días' }}</span>
+                <strong>{{ o.total | currency }}</strong>
+              </div>
+              <div class="progress">
+                <div class="progress__bar"><div class="fill" [style.width.%]="o.progreso"></div></div>
+                <div class="progress__percent">{{ o.progreso }}%</div>
+              </div>
+              <div class="card__nav">
+                <button type="button" aria-label="Mover a la columna anterior" [disabled]="!puedeMover(o, -1)" (click)="mover(o, vecino(o, -1)!)">←</button>
+                <button type="button" aria-label="Mover a la columna siguiente" [disabled]="!puedeMover(o, 1)" (click)="mover(o, vecino(o, 1)!)">→</button>
+              </div>
+            </article>
+          } @empty {
+            <p class="vacia">Sin órdenes</p>
+          }
+        </section>
+      }
+    </div>
+
+    @if (ordenes().length === 0) {
+      <mt-empty-state title="No hay vehículos en el taller" text="Cuando recibas un vehículo aparecerá aquí.">
+        <a class="mt-link" routerLink="/home/recepcion">Recibir un vehículo</a>
+      </mt-empty-state>
+    }
+  }
+
+  @if (verCerradas()) {
+    <section class="cerradas">
+      <h2>Cerradas en los últimos 30 días</h2>
+      <mt-table [columns]="columnasCerradas" [rows]="cerradas()" [loading]="cargandoCerradas()">
+        <ng-template mtCell="numero" let-row>
+          <a class="mt-link" [routerLink]="['/home/ordenes', row.id]">{{ row.numero }}</a>
+        </ng-template>
+        <ng-template mtCell="estado" let-row><mt-badge-estado [estado]="row.estado" /></ng-template>
+        <ng-template mtCell="vehiculo" let-row>{{ row.vehiculo_placa }} · {{ row.vehiculo_marca }} {{ row.vehiculo_modelo }}</ng-template>
+        <ng-template mtCell="cliente" let-row>{{ row.cliente_nombre }}</ng-template>
+        <ng-template mtCell="fecha_entrada" let-row>{{ row.fecha_entrada | date: 'dd/MM/yyyy' }}</ng-template>
+        <ng-template mtCell="total" let-row>{{ row.total | currency }}</ng-template>
+        <div empty><mt-empty-state title="Sin órdenes cerradas" text="No hay entregas ni cancelaciones recientes." /></div>
+      </mt-table>
+    </section>
+  }
 </div>

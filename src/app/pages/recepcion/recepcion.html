@@ -1,0 +1,171 @@
+<div class="mt-page">
+  <mt-page-header title="Recibir vehículo" subtitle="Registra la entrada de un vehículo y abre su orden de trabajo.">
+    <a class="mt-link" routerLink="/home/recepcion/clientes">Ver clientes</a>
+  </mt-page-header>
+
+  <form class="placa" (submit)="$event.preventDefault(); irAPlaca()">
+    <input
+      class="mt-search"
+      type="search"
+      placeholder="Buscar por placa..."
+      aria-label="Buscar por placa"
+      [value]="placaBusqueda()"
+      (input)="placaBusqueda.set($any($event.target).value)"
+    />
+    <mt-button type="submit" variant="ghost" [loading]="buscandoPlaca()">Buscar por placa</mt-button>
+  </form>
+
+  <ol class="stepper" aria-label="Pasos">
+    @for (nombre of pasos; track nombre; let i = $index) {
+      <li [class.activo]="paso() === i + 1" [class.hecho]="paso() > i + 1" [attr.aria-current]="paso() === i + 1 ? 'step' : null">
+        <span class="stepper__n">{{ i + 1 }}</span>{{ nombre }}
+      </li>
+    }
+  </ol>
+
+  <!-- Paso 1: cliente -->
+  @if (paso() === 1) {
+    <section class="mt-card mt-stack">
+      @if (!creandoCliente()) {
+        <h2>¿Quién trae el vehículo?</h2>
+        <input
+          class="mt-search"
+          type="search"
+          placeholder="Busca por nombre, teléfono o placa..."
+          aria-label="Buscar cliente"
+          [value]="busqueda()"
+          (input)="busqueda.set($any($event.target).value)"
+        />
+        @if (buscando()) {
+          <p class="mt-muted">Buscando...</p>
+        } @else if (busqueda().trim().length >= 2 && resultados().length === 0) {
+          <p class="mt-muted">No encontramos coincidencias.</p>
+        }
+        <ul class="lista">
+          @for (c of resultados(); track c.id) {
+            <li>
+              <button type="button" class="opcion" (click)="elegirCliente(c)">
+                <strong>{{ c.nombre }}</strong>
+                <span class="mt-muted">
+                  {{ c.telefono || 'Sin teléfono' }}
+                  @if (placasCoincidentes()[c.id]; as placa) {
+                    · placa {{ placa }}
+                  }
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+        <div class="mt-actions">
+          <mt-button variant="secondary" (click)="creandoCliente.set(true)">Crear cliente nuevo</mt-button>
+        </div>
+      } @else {
+        <h2>Nuevo cliente</h2>
+        <app-cliente-form (guardado)="clienteCreado($event)" (cancelado)="creandoCliente.set(false)" />
+      }
+    </section>
+  }
+
+  <!-- Paso 2: vehículo -->
+  @if (paso() === 2) {
+    <section class="mt-card mt-stack">
+      <h2>Vehículo de {{ cliente()?.nombre }}</h2>
+      @if (cargandoVehiculos()) {
+        <p class="mt-muted">Cargando vehículos...</p>
+      } @else if (!creandoVehiculo()) {
+        @if (vehiculos().length === 0) {
+          <mt-empty-state title="Sin vehículos" text="Agrega el vehículo que está recibiendo." />
+        }
+        <ul class="lista">
+          @for (v of vehiculos(); track v.id) {
+            <li>
+              <button type="button" class="opcion" [class.elegida]="vehiculo()?.id === v.id" (click)="elegirVehiculo(v)">
+                <strong>{{ v.placa }}</strong>
+                <span class="mt-muted">{{ v.marca }} {{ v.modelo }} {{ v.anio }} {{ v.color }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+        <div class="mt-actions">
+          <mt-button variant="ghost" (click)="creandoVehiculo.set(true)">Agregar vehículo</mt-button>
+        </div>
+      } @else {
+        <app-vehiculo-form
+          [clienteId]="cliente()!.id"
+          (guardado)="vehiculoCreado($event)"
+          (cancelado)="creandoVehiculo.set(false)"
+        />
+      }
+      <div class="mt-actions">
+        <mt-button variant="ghost" (click)="volver()">Atrás</mt-button>
+        <mt-button [disabled]="!puedeAvanzarPaso2()" (click)="irAPaso3()">Continuar</mt-button>
+      </div>
+    </section>
+  }
+
+  <!-- Paso 3: orden -->
+  @if (paso() === 3) {
+    <form class="mt-card mt-stack" [formGroup]="form" (ngSubmit)="crearOrden()" novalidate>
+      <h2>{{ vehiculo()?.placa }} · {{ cliente()?.nombre }}</h2>
+
+      <mt-input label="Motivo de la visita *" [rows]="3" placeholder="¿Qué problema reporta el cliente?" formControlName="motivo" />
+
+      <div class="mt-grid-2">
+        <mt-input label="Kilometraje de entrada" type="number" [min]="0" formControlName="kilometraje" />
+        <mt-input label="Fecha prometida de entrega" type="datetime-local" formControlName="fechaPromesa" />
+      </div>
+
+      <div class="campo">
+        <label for="combustible">Nivel de combustible: <strong>{{ form.controls.combustible.value }}%</strong></label>
+        <input id="combustible" type="range" min="0" max="100" step="25" formControlName="combustible" />
+        <div class="escala"><span>Vacío</span><span>1/4</span><span>1/2</span><span>3/4</span><span>Lleno</span></div>
+      </div>
+
+      <fieldset class="checklist" formGroupName="inventario">
+        <legend>Inventario de entrada</legend>
+        @for (item of checklist; track item.key) {
+          <label class="check"><input type="checkbox" [formControlName]="item.key" /> {{ item.label }}</label>
+        }
+      </fieldset>
+
+      <mt-select
+        label="Mecánico asignado (opcional)"
+        placeholder="Sin asignar"
+        [options]="mecanicos()"
+        formControlName="mecanicoId"
+      />
+
+      <div class="campo">
+        <label for="fotos">Fotos (hasta {{ maxFotos }}, máx. 5 MB cada una)</label>
+        <input id="fotos" type="file" accept="image/jpeg,image/png,image/webp" multiple (change)="agregarFotos($event)" />
+        @if (errorFotos(); as msg) {
+          <div class="mt-error" role="alert">{{ msg }}</div>
+        }
+        @if (fotos().length) {
+          <ul class="fotos">
+            @for (f of fotos(); track f.url; let i = $index) {
+              <li>
+                <img [src]="f.url" [alt]="'Foto ' + (i + 1)" />
+                <button type="button" aria-label="Quitar foto" (click)="quitarFoto(i)">×</button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      @if (errorOrden(); as msg) {
+        <div class="mt-error" role="alert">
+          {{ msg }}
+          @if (limiteAlcanzado()) {
+            <button type="button" class="mejorar" disabled title="Próximamente">Mejorar plan</button>
+          }
+        </div>
+      }
+
+      <div class="mt-actions">
+        <mt-button variant="ghost" (click)="volver()">Atrás</mt-button>
+        <mt-button type="submit" [loading]="enviando()">Crear orden de trabajo</mt-button>
+      </div>
+    </form>
+  }
+</div>

@@ -1,0 +1,134 @@
+<div class="mt-page">
+  @if (cargando()) {
+    <p class="mt-muted">Cargando factura...</p>
+  } @else if (error(); as msg) {
+    <div class="mt-error" role="alert">{{ msg }}</div>
+    <p><a class="mt-link" routerLink="/home/finanzas">← Volver a finanzas</a></p>
+  } @else if (factura(); as f) {
+    <div class="barra no-print">
+      <a class="mt-link" routerLink="/home/finanzas">← Finanzas</a>
+      <div class="mt-actions">
+        <mt-button variant="ghost" (click)="imprimir()">Imprimir / PDF</mt-button>
+        @if (puedeCobrar()) {
+          <mt-button (click)="modalPago.set(true)">Registrar pago</mt-button>
+        }
+        @if (puedeAnular()) {
+          <mt-button variant="danger" (click)="modalAnular.set(true)">Anular</mt-button>
+        }
+      </div>
+    </div>
+
+    <article class="mt-card documento">
+      <header class="documento__cab">
+        <div class="emisor">
+          <h2>{{ taller()?.nombre }}</h2>
+          @if (taller()?.rnc) {
+            <div>RNC: {{ taller()?.rnc }}</div>
+          }
+          @if (taller()?.telefono) {
+            <div>Tel.: {{ taller()?.telefono }}</div>
+          }
+          @if (taller()?.direccion) {
+            <div>{{ taller()?.direccion }}</div>
+          }
+        </div>
+        <div class="numero">
+          <h1>Factura {{ f.numero }}</h1>
+          <mt-badge-estado [estado]="f.estado_efectivo" />
+          @if (f.ncf) {
+            <div>NCF: <strong>{{ f.ncf }}</strong></div>
+          }
+          @if (f.tipo_ncf) {
+            <div class="mt-muted">{{ ncfEtiqueta[f.tipo_ncf] }}</div>
+          }
+          <div>Emisión: {{ f.fecha_emision | date: 'dd/MM/yyyy' }}</div>
+          <div>Vence: {{ f.fecha_vencimiento ? (f.fecha_vencimiento | date: 'dd/MM/yyyy') : '—' }}</div>
+        </div>
+      </header>
+
+      <section class="partes">
+        <div><span class="mt-muted">Cliente</span><br /><strong>{{ f.cliente_nombre }}</strong></div>
+        <div>
+          <span class="mt-muted">Vehículo</span><br />
+          <strong>{{ f.vehiculo_placa || '—' }} {{ f.vehiculo_marca }} {{ f.vehiculo_modelo }}</strong>
+        </div>
+        @if (f.orden_numero) {
+          <div><span class="mt-muted">Orden</span><br /><strong>{{ f.orden_numero }}</strong></div>
+        }
+      </section>
+
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>Descripción</th><th class="num">Cant.</th><th class="num">Precio</th><th>ITBIS</th><th class="num">Importe</th></tr>
+          </thead>
+          <tbody>
+            @for (i of items(); track i.id) {
+              <tr>
+                <td>{{ i.descripcion }}</td>
+                <td class="num">{{ i.cantidad }}</td>
+                <td class="num">{{ i.precio_unitario | currency }}</td>
+                <td>{{ i.aplica_itbis ? 'Sí' : 'No' }}</td>
+                <td class="num">{{ i.importe | currency }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <dl class="totales">
+        <div><dt>Subtotal</dt><dd>{{ f.subtotal | currency }}</dd></div>
+        <div><dt>ITBIS</dt><dd>{{ f.itbis | currency }}</dd></div>
+        <div class="totales__total"><dt>Total</dt><dd>{{ f.total | currency }}</dd></div>
+        <div><dt>Pagado</dt><dd>{{ f.pagado | currency }}</dd></div>
+        <div class="totales__saldo"><dt>Saldo</dt><dd>{{ f.balance | currency }}</dd></div>
+      </dl>
+
+      @if (f.notas) {
+        <p><strong>Notas:</strong> {{ f.notas }}</p>
+      }
+      @if (f.estado === 'anulada') {
+        <p class="anulada"><strong>Anulada:</strong> {{ f.anulada_motivo }}</p>
+      }
+
+      <p class="gracias">Gracias por su preferencia</p>
+    </article>
+
+    <section class="mt-card pagos no-print">
+      <h2>Pagos</h2>
+      @if (pagos().length === 0) {
+        <p class="mt-muted">Todavía no hay pagos registrados.</p>
+      } @else {
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr><th>Fecha</th><th>Método</th><th>Referencia</th><th class="num">Monto</th></tr>
+            </thead>
+            <tbody>
+              @for (p of pagos(); track p.id) {
+                <tr>
+                  <td>{{ p.fecha | date: 'dd/MM/yyyy HH:mm' }}</td>
+                  <td>{{ metodo[p.metodo] }}</td>
+                  <td>{{ p.referencia || '—' }}</td>
+                  <td class="num">{{ p.monto | currency }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+
+    <mt-modal [open]="modalPago()" title="Registrar pago" size="sm" (closed)="modalPago.set(false)">
+      @if (modalPago()) {
+        <app-pago-form [facturaId]="f.id" [balance]="f.balance" (registrado)="pagoRegistrado()" (cancelado)="modalPago.set(false)" />
+      }
+    </mt-modal>
+
+    <mt-modal [open]="modalAnular()" title="Anular factura" size="sm" (closed)="modalAnular.set(false)">
+      @if (modalAnular()) {
+        <app-anular-form [facturaId]="f.id" (anulada)="facturaAnulada()" (cancelado)="modalAnular.set(false)" />
+      }
+    </mt-modal>
+  }
+</div>

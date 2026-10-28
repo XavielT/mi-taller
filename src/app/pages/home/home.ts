@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Navbar } from '../../../shared/components/navbar/navbar';
 import { Footer } from '../../../shared/components/footer/footer';
 import { Header } from '../../../shared/components/header/header';
 import { RouterOutlet } from '@angular/router';
+import { TallerStore } from '../../../shared/stores/taller.store';
 
 @Component({
   standalone: true,
@@ -11,4 +12,7 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './home.html',
   styleUrls: ['./home.scss'],
 })
-export class Home {}
+export class Home {
+  protected store = inject(TallerStore);
+  menuAbierto = signal(false);
+}

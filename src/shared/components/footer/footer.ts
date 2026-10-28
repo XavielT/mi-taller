@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import pkg from '../../../../package.json';
 
 @Component({
   standalone: true,
@@ -7,4 +8,6 @@ import { Component } from '@angular/core';
   templateUrl: './footer.html',
   styleUrls: ['./footer.scss'],
 })
-export class Footer {}
+export class Footer {
+  readonly version = pkg.version;
+}

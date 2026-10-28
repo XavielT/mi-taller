@@ -1,21 +1,164 @@
+.repairs h2 {
+  font-family: var(--font-titles);
+  color: var(--primary);
+  font-size: 1.2rem;
+}
 
-.page.repairs { padding:24px; font-family: var(--font-body); color: var(--subtitles) }
-.board { display:flex; gap:16px; align-items:flex-start }
-.column { background:#fff; border:1px solid rgba(0,0,0,0.04); padding:14px; width:300px; border-radius:10px }
-.column h3 { font-family: var(--font-titles); color: var(--primary2); margin:0 0 12px 0 }
-.card { background:#fbfdff; padding:12px; border-radius:8px; margin-bottom:10px; box-shadow: 0 1px 0 rgba(0,0,0,0.02) }
-.card__title { font-weight:600; font-family: var(--font-span); color: var(--primary2) }
-.card__meta { font-size:13px; color: var(--gray-ultra-light); margin-top:6px }
-.badge { background: var(--input-bg); padding:4px 10px; border-radius:12px; font-size:12px }
+.filtro {
+  flex: 0 1 14rem;
+}
 
-.card__head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px }
-.tag { background:#eef6ff; color:var(--primary2); padding:6px 8px; border-radius:6px; font-size:12px }
-.plate { font-size:12px; color:var(--gray-ultra-light) }
-.card__info { display:flex; justify-content:space-between; align-items:center; margin-top:10px }
-.owner { font-size:13px; color:var(--gray-ultra-light) }
-.progress { display:flex; gap:8px; align-items:center }
-.progress__bar { width:120px; height:8px; background: #eef3f7; border-radius:8px; overflow:hidden }
-.progress__bar .fill { height:100%; background: linear-gradient(90deg,var(--secondary), var(--secondary-hover)); }
-.progress__percent { font-size:12px; color:var(--gray-ultra-light) }
+.board {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+}
 
+.column {
+  flex: 0 0 280px;
+  min-height: 12rem;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--borders);
+  border-radius: var(--radius);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 
+  &.sobre {
+    background: var(--info-container);
+    border-color: var(--primary2);
+  }
+
+  h3 {
+    margin: 0 0 12px;
+    font-family: var(--font-titles);
+    color: var(--primary2);
+  }
+}
+
+.badge {
+  background: var(--input-bg);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.vacia {
+  margin: 0;
+  padding: 1rem 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.card {
+  margin-bottom: 10px;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  cursor: grab;
+
+  &.arrastrando {
+    opacity: 0.45;
+  }
+}
+
+.card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.plate {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--info-container);
+  color: var(--primary2);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card__title {
+  font-weight: 600;
+  font-family: var(--font-span);
+  color: var(--primary2);
+}
+
+.card__meta {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.card__info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.chip {
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--titles);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.progress {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.progress__bar {
+  flex: 1;
+  height: 8px;
+  background: #eef3f7;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.progress__bar .fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--secondary), var(--secondary-hover));
+}
+
+.progress__percent {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.card__nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+
+  button {
+    min-width: 2.2rem;
+    height: 2rem;
+    border: 1px solid var(--borders);
+    border-radius: 8px;
+    background: var(--surface);
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.cerradas {
+  margin-top: 2rem;
+}

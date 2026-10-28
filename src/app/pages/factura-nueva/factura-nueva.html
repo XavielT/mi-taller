@@ -1,0 +1,70 @@
+<div class="mt-page">
+  @if (cargando()) {
+    <p class="mt-muted">Cargando orden...</p>
+  } @else if (error(); as msg) {
+    <div class="mt-error" role="alert">{{ msg }}</div>
+    <p><a class="mt-link" routerLink="/home/finanzas">← Volver a finanzas</a></p>
+  } @else if (orden(); as o) {
+    <mt-page-header title="Nueva factura" [subtitle]="'Orden ' + o.numero">
+      <a class="mt-link" [routerLink]="['/home/ordenes', o.id]">← Volver a la orden</a>
+    </mt-page-header>
+
+    @if (!estadoValido()) {
+      <mt-empty-state title="La orden aún no se puede facturar" text="Solo se facturan órdenes en estado Listo o Entregado.">
+        <a class="mt-link" [routerLink]="['/home/ordenes', o.id]">Ir a la orden</a>
+      </mt-empty-state>
+    } @else {
+      <section class="mt-card vista">
+        <div class="vista__datos">
+          <div><span class="mt-muted">Cliente</span><br /><strong>{{ o.cliente_nombre }}</strong></div>
+          <div><span class="mt-muted">Vehículo</span><br /><strong>{{ o.vehiculo_placa }} · {{ o.vehiculo_marca }} {{ o.vehiculo_modelo }}</strong></div>
+        </div>
+
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr><th>Descripción</th><th class="num">Cant.</th><th class="num">Precio</th><th>ITBIS</th><th class="num">Importe</th></tr>
+            </thead>
+            <tbody>
+              @for (i of items(); track i.id) {
+                <tr>
+                  <td>{{ i.descripcion }}</td>
+                  <td class="num">{{ i.cantidad }}</td>
+                  <td class="num">{{ i.precio_unitario | currency }}</td>
+                  <td>{{ i.aplica_itbis ? 'Sí' : 'No' }}</td>
+                  <td class="num">{{ importe(i) | currency }}</td>
+                </tr>
+              } @empty {
+                <tr><td colspan="5" class="vacio">La orden no tiene ítems. Agrégalos antes de facturar.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <dl class="totales">
+          <div><dt>Subtotal</dt><dd>{{ totales().subtotal | currency }}</dd></div>
+          <div><dt>ITBIS ({{ itbisPct() }}%)</dt><dd>{{ totales().itbis | currency }}</dd></div>
+          <div class="totales__total"><dt>Total</dt><dd>{{ totales().total | currency }}</dd></div>
+        </dl>
+        <p class="mt-muted">Los totales definitivos se congelan en el sistema al emitir la factura.</p>
+      </section>
+
+      <form class="mt-card mt-stack" [formGroup]="form" (ngSubmit)="emitir()" novalidate>
+        <div class="mt-grid-2">
+          <mt-select label="Tipo de NCF" placeholder="Sin NCF" [options]="tiposNcf" formControlName="tipo_ncf" />
+          <mt-input label="NCF" placeholder="B0100000001" hint="Opcional. Una letra B/E y 10 dígitos." formControlName="ncf" />
+        </div>
+        <mt-input label="Fecha de vencimiento *" type="date" formControlName="fecha_vencimiento" />
+        <mt-input label="Notas" [rows]="3" formControlName="notas" />
+
+        @if (errorEmision(); as msg) {
+          <div class="mt-error" role="alert">{{ msg }}</div>
+        }
+
+        <div class="mt-actions">
+          <mt-button type="submit" size="lg" [disabled]="items().length === 0" [loading]="emitiendo()">Emitir factura</mt-button>
+        </div>
+      </form>
+    }
+  }
+</div>

@@ -1,0 +1,42 @@
+<div class="nueva">
+    <div class="nueva__title">
+        <h2>Nueva contraseña</h2>
+        <span>Elige una contraseña de al menos 6 caracteres.</span>
+    </div>
+
+    @if (auth.ready() && !auth.isAuthenticated()) {
+        <div class="nueva__form-group">
+            <div class="form-message">
+                <div class="message error-message">
+                    <span class="message-icon">⚠</span>
+                    <div class="message-text"><p>El enlace no es válido o ya venció. Solicita uno nuevo.</p></div>
+                </div>
+            </div>
+        </div>
+        <div class="nueva__form-group-title"><a routerLink="/auth/recuperar">Solicitar un enlace nuevo</a></div>
+    } @else {
+        <form class="nueva__form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+            <div class="nueva__form-group">
+                <mt-input label="Nueva contraseña" type="password" placeholder="Nueva contraseña"
+                    icon="assets/icons/lock-icon.svg" formControlName="password" />
+            </div>
+            <div class="nueva__form-group">
+                <mt-input label="Confirmar contraseña" type="password" placeholder="Repite la contraseña"
+                    icon="assets/icons/lock-icon.svg" formControlName="confirmar" />
+            </div>
+
+            <mt-button class="nueva__submit" type="submit" size="lg" [loading]="isLoading()">
+                {{ isLoading() ? 'Guardando...' : 'Guardar contraseña' }}
+            </mt-button>
+
+            @if (error(); as msg) {
+                <div class="form-message">
+                    <div class="message error-message">
+                        <span class="message-icon">⚠</span>
+                        <div class="message-text"><p>{{ msg }}</p></div>
+                    </div>
+                </div>
+            }
+        </form>
+    }
+</div>

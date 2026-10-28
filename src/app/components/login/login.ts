@@ -1,46 +1,54 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../shared/services/auth.service';
+import { MtButton, MtInput } from '../../../shared/ui';
 
 @Component({
   standalone: true,
   selector: 'app-login',
-  imports: [CommonModule, FormsModule],
+  imports: [ReactiveFormsModule, RouterLink, MtInput, MtButton],
   templateUrl: './login.html',
   styleUrls: ['./login.scss'],
 })
 export class Login {
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  // for submit btn
-  isLoading = false;
-  errorMessage: string | null = null;
+  isLoading = signal(false);
+  error = signal<string | null>(null);
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ){}
+  form = this.fb.nonNullable.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+  });
 
-  // Manage the submit
-  async onLoginSubmit(form: NgForm): Promise<void> {
-    if (form.invalid) return;
+  async onSubmit(): Promise<void> {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
-    this.isLoading = true;
-    this.errorMessage = null;
+    this.isLoading.set(true);
+    this.error.set(null);
 
     try {
-      await this.authService.login({
-        email: form.value.email,
-        password: form.value.password
-      });
-
-      this.router.navigate(['/home']);
-
-    } catch (error: any) {
-      this.errorMessage = error.message;
+      await this.authService.signIn(this.form.getRawValue());
+      await this.router.navigate(['/home']);
+    } catch (e) {
+      this.error.set(e instanceof Error ? e.message : 'Algo ha salido mal');
     } finally {
-      this.isLoading = false;
+      this.isLoading.set(false);
+    }
+  }
+
+  async google(): Promise<void> {
+    this.error.set(null);
+    try {
+      await this.authService.signInWithGoogle();
+    } catch (e) {
+      this.error.set(e instanceof Error ? e.message : 'Algo ha salido mal');
     }
   }
 }

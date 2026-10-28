@@ -1,16 +1,21 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, DEFAULT_CURRENCY_CODE, LOCALE_ID, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeEsDO from '@angular/common/locales/es-DO';
 import { provideRouter } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 import { routes } from './app.routes';
-import { provideAnimations } from '@angular/platform-browser/animations';
+
+registerLocaleData(localeEsDO);
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideAnimations(),
-    // Provide HttpClient so services can switch to real API calls when API_BASE is set
-    importProvidersFrom(HttpClientModule)
+    provideHttpClient(),
+    { provide: LOCALE_ID, useValue: 'es-DO' },
+    { provide: DEFAULT_CURRENCY_CODE, useValue: 'DOP' }
   ]
 };

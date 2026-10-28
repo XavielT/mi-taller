@@ -1,0 +1,259 @@
+<div class="mt-page orden">
+  @if (cargando()) {
+    <p class="mt-muted">Cargando orden...</p>
+  } @else if (error(); as msg) {
+    <div class="mt-error" role="alert">{{ msg }}</div>
+    <p><a class="mt-link" routerLink="/home/reparaciones">← Volver a reparaciones</a></p>
+  } @else if (orden(); as o) {
+    <!-- Cabecera -->
+    <header class="mt-card cabecera">
+      <div class="cabecera__top">
+        <div>
+          <h1>{{ o.numero }}</h1>
+          <mt-badge-estado [estado]="o.estado" />
+        </div>
+        <div class="mt-actions">
+          <a class="mt-link" routerLink="/home/reparaciones">← Reparaciones</a>
+          @if (factura(); as f) {
+            <a class="mt-link" [routerLink]="['/home/finanzas/facturas', f.id]">Ver factura {{ f.numero }}</a>
+          } @else if (puedeFacturar()) {
+            <a class="boton-link" routerLink="/home/finanzas/facturas/nueva" [queryParams]="{ orden: o.id }">Facturar</a>
+          }
+        </div>
+      </div>
+
+      <dl class="datos">
+        <div>
+          <dt>Cliente</dt>
+          <dd><a class="mt-link" [routerLink]="['/home/recepcion/clientes', o.cliente_id]">{{ o.cliente_nombre }}</a></dd>
+        </div>
+        <div>
+          <dt>Vehículo</dt>
+          <dd>{{ o.vehiculo_placa }} · {{ o.vehiculo_marca }} {{ o.vehiculo_modelo }} {{ o.vehiculo_anio }}</dd>
+        </div>
+        <div>
+          <dt>Mecánico</dt>
+          <dd>
+            @if (editable()) {
+              <mt-select
+                placeholder="Sin asignar"
+                [options]="mecanicos()"
+                [ngModel]="o.mecanico_id"
+                (ngModelChange)="cambiarMecanico($event)"
+              />
+            } @else {
+              {{ o.mecanico_nombre || 'Sin asignar' }}
+            }
+          </dd>
+        </div>
+        <div><dt>Entrada</dt><dd>{{ o.fecha_entrada | date: 'dd/MM/yyyy HH:mm' }}</dd></div>
+        <div><dt>Promesa</dt><dd>{{ o.fecha_promesa ? (o.fecha_promesa | date: 'dd/MM/yyyy HH:mm') : '—' }}</dd></div>
+        <div><dt>Entrega</dt><dd>{{ o.fecha_entrega ? (o.fecha_entrega | date: 'dd/MM/yyyy HH:mm') : '—' }}</dd></div>
+      </dl>
+
+      <div class="progreso">
+        <label for="progreso">Progreso: <strong>{{ progreso() }}%</strong></label>
+        <input
+          id="progreso"
+          type="range"
+          min="0"
+          max="100"
+          step="5"
+          [value]="progreso()"
+          [disabled]="!editable()"
+          (input)="moverProgreso(+$any($event.target).value)"
+        />
+      </div>
+
+      @if (o.motivo) {
+        <p class="motivo"><strong>Motivo:</strong> {{ o.motivo }}</p>
+      }
+      @if (itemsChecklist(o).length) {
+        <p class="mt-muted">Dejó: {{ itemsChecklist(o).join(', ') }}.</p>
+      }
+    </header>
+
+    <!-- Acciones de estado -->
+    @if (acciones().length) {
+      <section class="acciones" aria-label="Cambiar estado">
+        @for (a of acciones(); track a) {
+          <mt-button [variant]="a === 'cancelado' ? 'danger' : a === 'entregado' || a === 'listo' ? 'secondary' : 'primary'" (click)="abrirCambio(a)">
+            {{ a === 'cancelado' ? 'Cancelar orden' : 'Pasar a ' + etiqueta[a] }}
+          </mt-button>
+        }
+      </section>
+    }
+
+    <!-- Ítems -->
+    <section class="mt-card seccion">
+      <h2>Trabajos y repuestos</h2>
+      <div class="tabla-scroll">
+        <table class="items">
+          <thead>
+            <tr>
+              <th aria-label="Completado">✓</th>
+              <th>Tipo</th>
+              <th>Descripción</th>
+              <th class="num">Cantidad</th>
+              <th class="num">Precio</th>
+              <th>ITBIS</th>
+              <th class="num">Importe</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (i of items(); track i.id) {
+              <tr>
+                <td>
+                  <input type="checkbox" [checked]="i.completado" [disabled]="o.estado === 'cancelado'" [attr.aria-label]="'Completado: ' + i.descripcion" (change)="editarItem(i, { completado: $any($event.target).checked })" />
+                </td>
+                <td>
+                  @if (editable()) {
+                    <select [value]="i.tipo" (change)="editarItem(i, { tipo: $any($event.target).value })">
+                      <option value="mano_obra">Mano de obra</option>
+                      <option value="repuesto">Repuesto</option>
+                    </select>
+                  } @else {
+                    {{ i.tipo === 'mano_obra' ? 'Mano de obra' : 'Repuesto' }}
+                  }
+                </td>
+                <td>
+                  @if (editable()) {
+                    <input class="celda" type="text" [value]="i.descripcion" (change)="editarDescripcion(i, $any($event.target).value)" />
+                  } @else {
+                    {{ i.descripcion }}
+                  }
+                </td>
+                <td class="num">
+                  @if (editable()) {
+                    <input class="celda celda--num" type="number" min="0.01" step="0.01" [value]="i.cantidad" (change)="editarNumero(i, 'cantidad', $any($event.target).value)" />
+                  } @else {
+                    {{ i.cantidad }}
+                  }
+                </td>
+                <td class="num">
+                  @if (editable()) {
+                    <input class="celda celda--num" type="number" min="0" step="0.01" [value]="i.precio_unitario" (change)="editarNumero(i, 'precio_unitario', $any($event.target).value)" />
+                  } @else {
+                    {{ i.precio_unitario | currency }}
+                  }
+                </td>
+                <td>
+                  <input type="checkbox" [checked]="i.aplica_itbis" [disabled]="!editable()" aria-label="Aplica ITBIS" (change)="editarItem(i, { aplica_itbis: $any($event.target).checked })" />
+                </td>
+                <td class="num">{{ importe(i) | currency }}</td>
+                <td>
+                  @if (editable()) {
+                    <button type="button" class="quitar" aria-label="Eliminar ítem" (click)="eliminarItem(i)">×</button>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="8" class="vacio">Todavía no hay ítems. Agrega el primero abajo.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (editable()) {
+        <form class="nuevo-item" [formGroup]="itemForm" (ngSubmit)="agregarItem()" novalidate>
+          <select formControlName="tipo" aria-label="Tipo">
+            <option value="mano_obra">Mano de obra</option>
+            <option value="repuesto">Repuesto</option>
+          </select>
+          <input type="text" placeholder="Descripción" formControlName="descripcion" aria-label="Descripción" />
+          <input type="number" min="0.01" step="0.01" placeholder="Cant." formControlName="cantidad" aria-label="Cantidad" />
+          <input type="number" min="0" step="0.01" placeholder="Precio" formControlName="precio_unitario" aria-label="Precio unitario" />
+          <label class="check"><input type="checkbox" formControlName="aplica_itbis" /> ITBIS</label>
+          <mt-button type="submit" size="sm" [loading]="agregando()">Agregar</mt-button>
+        </form>
+      }
+
+      <dl class="totales">
+        <div><dt>Subtotal</dt><dd>{{ totales().subtotal | currency }}</dd></div>
+        <div><dt>ITBIS ({{ itbisPct() }}%)</dt><dd>{{ totales().itbis | currency }}</dd></div>
+        <div class="totales__total"><dt>Total</dt><dd>{{ totales().total | currency }}</dd></div>
+        <div class="mt-muted"><dt>Total guardado en el sistema</dt><dd>{{ o.total | currency }}</dd></div>
+      </dl>
+    </section>
+
+    <!-- Diagnóstico y notas -->
+    <section class="mt-card seccion">
+      <h2>Diagnóstico y notas</h2>
+      <div class="mt-grid-2">
+        <div class="campo">
+          <label for="diagnostico">Diagnóstico</label>
+          <textarea id="diagnostico" rows="5" [disabled]="o.estado === 'cancelado'" [value]="diagnostico()" (input)="diagnostico.set($any($event.target).value)" (blur)="guardarTexto('diagnostico')"></textarea>
+        </div>
+        <div class="campo">
+          <label for="notas">Notas internas</label>
+          <textarea id="notas" rows="5" [disabled]="o.estado === 'cancelado'" [value]="notas()" (input)="notas.set($any($event.target).value)" (blur)="guardarTexto('notas_internas')"></textarea>
+        </div>
+      </div>
+      <p class="mt-muted">Se guardan solos al salir del campo.</p>
+    </section>
+
+    <!-- Fotos -->
+    <section class="mt-card seccion">
+      <div class="seccion__head">
+        <h2>Fotos</h2>
+        @if (o.estado !== 'cancelado' && o.fotos.length < maxFotos) {
+          <label class="subir">
+            {{ subiendoFotos() ? 'Subiendo...' : 'Agregar fotos' }}
+            <input type="file" accept="image/jpeg,image/png,image/webp" multiple [disabled]="subiendoFotos()" (change)="subirFotos($event)" />
+          </label>
+        }
+      </div>
+      @if (fotos().length) {
+        <ul class="galeria">
+          @for (f of fotos(); track f.path) {
+            <li><a [href]="f.url" target="_blank" rel="noopener"><img [src]="f.url" alt="Foto de la orden" loading="lazy" /></a></li>
+          }
+        </ul>
+      } @else {
+        <mt-empty-state title="Sin fotos" text="Puedes agregar hasta {{ maxFotos }} fotos del vehículo." />
+      }
+    </section>
+
+    <!-- Historial -->
+    <section class="mt-card seccion">
+      <h2>Historial</h2>
+      <ol class="timeline">
+        @for (h of historial(); track h.id) {
+          <li>
+            <div class="timeline__estado">
+              @if (h.de_estado) {
+                {{ etiqueta[h.de_estado] }} →
+              }
+              <strong>{{ etiqueta[h.a_estado] }}</strong>
+            </div>
+            <div class="mt-muted">{{ h.created_at | date: 'dd/MM/yyyy HH:mm' }} · {{ h.usuario || 'Sistema' }}</div>
+            @if (h.comentario) {
+              <p>{{ h.comentario }}</p>
+            }
+          </li>
+        }
+      </ol>
+    </section>
+
+    <!-- Modal de cambio de estado -->
+    <mt-modal
+      [open]="destino() !== null"
+      [title]="destino() === 'cancelado' ? 'Cancelar orden' : 'Pasar a ' + (destino() ? etiqueta[destino()!] : '')"
+      size="sm"
+      (closed)="destino.set(null)"
+    >
+      <div class="campo">
+        <label for="comentario">{{ destino() === 'cancelado' ? 'Motivo de la cancelación *' : 'Comentario (opcional)' }}</label>
+        <textarea id="comentario" rows="3" [value]="comentario()" (input)="comentario.set($any($event.target).value)"></textarea>
+      </div>
+      @if (errorEstado(); as msg) {
+        <div class="mt-error" role="alert">{{ msg }}</div>
+      }
+      <ng-container footer>
+        <mt-button variant="ghost" (click)="destino.set(null)">Volver</mt-button>
+        <mt-button [variant]="destino() === 'cancelado' ? 'danger' : 'primary'" [loading]="cambiando()" (click)="confirmarCambio()">Confirmar</mt-button>
+      </ng-container>
+    </mt-modal>
+  }
+</div>

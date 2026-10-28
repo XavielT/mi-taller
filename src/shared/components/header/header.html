@@ -1,16 +1,23 @@
 <header class="topbar">
   <div class="topbar__left">
+    <button class="hamburger" type="button" aria-label="Abrir menú" (click)="menuToggle.emit()">☰</button>
     <div class="logo-container">
       <img src="/assets/imgs/auth/mi-taller-logo.png" alt="logo" class="logo" />
       <div class="app-name">Mi Taller</div>
     </div>
     <div class="search">
-      <input placeholder="Buscar facturas, vehículo o cliente..." />
+      <input placeholder="Buscar facturas, vehículo o cliente..." disabled title="Próximamente" />
     </div>
   </div>
   <div class="topbar__right">
-    <button class="icon">🔔</button>
-    <button class="icon">⚙️</button>
-    <div class="avatar">Usuario</div>
+    <div class="user">
+      <button class="avatar" type="button" aria-haspopup="menu" [attr.aria-expanded]="menuAbierto()" (click)="menuAbierto.set(!menuAbierto())">{{ initials() }}</button>
+      @if (menuAbierto()) {
+        <div class="user__menu" role="menu">
+          <button type="button" role="menuitem" disabled title="Próximamente">Mi perfil <small>Próximamente</small></button>
+          <button type="button" role="menuitem" (click)="logout()">Cerrar sesión</button>
+        </div>
+      }
+    </div>
   </div>
 </header>

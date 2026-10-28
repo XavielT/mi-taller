@@ -1,18 +1,42 @@
-
 .topbar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:14px 22px;
-  border-bottom:1px solid rgba(0,0,0,0.04);
-  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--borders);
+  background: var(--surface);
 }
-.logo { height:40px; margin-right:12px }
-.logo-container { display:flex; align-items:center }
-.app-name { font-family: var(--font-titles); color: var(--primary2); margin-right:16px }
-.search input { padding:10px 14px; border-radius:12px; border:1px solid var(--input-bg); min-width:360px }
-.topbar__right { display:flex; gap:12px; align-items:center }
-.avatar { background:#f1f5f8; padding:6px 10px; border-radius:20px; font-family: var(--font-span) }
+.topbar__left { display: flex; align-items: center; gap: 12px }
+.logo { height: 40px; margin-right: 12px }
+.logo-container { display: flex; align-items: center }
+.app-name { font-family: var(--font-titles); color: var(--primary2); margin-right: 16px }
+.search input { padding: 10px 14px; border-radius: 12px; border: 1px solid var(--input-bg); min-width: 360px }
+.search input:disabled { cursor: not-allowed; opacity: 0.7 }
+.topbar__right { display: flex; gap: 12px; align-items: center }
+.hamburger { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--primary) }
+
+.user { position: relative }
+.avatar {
+  width: 38px; height: 38px; border-radius: 50%; border: none; cursor: pointer;
+  background: var(--primary); color: var(--titles); font-family: var(--font-span); font-weight: 700;
+}
+.user__menu {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 50; min-width: 180px;
+  display: flex; flex-direction: column; padding: 6px;
+  background: var(--surface); border: 1px solid var(--borders); border-radius: var(--radius); box-shadow: var(--shadow-sm);
+}
+.user__menu button {
+  text-align: left; padding: 8px 10px; background: none; border: none; border-radius: 6px;
+  font-family: var(--font-span); color: var(--text); cursor: pointer;
+}
+.user__menu button:hover:not(:disabled) { background: var(--input-bg) }
+.user__menu button:disabled { color: var(--text-muted); cursor: not-allowed }
+.user__menu small { margin-left: 6px; font-size: 0.7rem }
+
+@media (max-width: 899px) {
+  .hamburger { display: block }
+  .logo-container { display: none }
+}
 
 @media (max-width: 840px) {
   .search input { min-width: 140px }

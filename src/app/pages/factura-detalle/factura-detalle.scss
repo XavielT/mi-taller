@@ -1,0 +1,128 @@
+.barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.documento {
+  max-width: 52rem;
+}
+
+.documento__cab {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+
+  h1,
+  h2 {
+    margin: 0 0 0.35rem;
+    font-family: var(--font-titles);
+    color: var(--primary);
+  }
+
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+}
+
+.numero {
+  text-align: right;
+
+  div {
+    margin-top: 0.2rem;
+  }
+}
+
+.partes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 1.25rem;
+}
+
+.scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  min-width: 28rem;
+  border-collapse: collapse;
+
+  th {
+    padding: 0.5rem;
+    text-align: left;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--borders);
+  }
+
+  td {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--borders);
+  }
+
+  .num {
+    text-align: right;
+  }
+}
+
+.totales {
+  margin: 1rem 0 0.5rem auto;
+  max-width: 18rem;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.2rem 0;
+  }
+
+  dt,
+  dd {
+    margin: 0;
+  }
+}
+
+.totales__total {
+  border-top: 1px solid var(--borders);
+  padding-top: 0.5rem !important;
+  font-family: var(--font-titles);
+  font-size: 1.15rem;
+  color: var(--primary);
+}
+
+.totales__saldo {
+  font-weight: 700;
+}
+
+.anulada {
+  color: var(--alert);
+}
+
+.gracias {
+  margin: 1.5rem 0 0;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.pagos {
+  max-width: 52rem;
+  margin-top: 1.25rem;
+
+  h2 {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-titles);
+    color: var(--primary);
+    font-size: 1.15rem;
+  }
+}

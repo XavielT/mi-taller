@@ -11,14 +11,22 @@
     --bg: #f7fafc;
     --shadow: #000000;
     --titles: #ffffff;
-    --subtitles: #000000;
-    --borders: #000000;
+    --subtitles: #1f2a37;
+    --borders: #d9e1ea;
     --alert: #ba1a1a;
-    --warning: #000000;
-    --ok: #000000;
+    --warning: #b26a00;
+    --ok: #0b8a3e;
     --error-container: #ffdad6;
     --gray-ultra-light:#929090;
     --input-bg: #eaeaea;
+    --success-container: #e8f8ef;
+    --warning-container: #fff6e8;
+    --info-container: #eef6ff;
+    --surface: #ffffff;
+    --text: #1f2a37;
+    --text-muted: #6b7a8c;
+    --radius: 10px;
+    --shadow-sm: 0 1px 2px rgba(0,37,71,.06);
 }
 
 //Global fonts
@@ -52,7 +60,7 @@
 }
 
 html {
-    background-color: var(--main);
+    background-color: var(--bg);
 
     /* Firefox */
     scrollbar-width: none;
@@ -98,4 +106,133 @@ app-home > main.app-main {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
+}
+
+/* Shared page building blocks (prefix mt- to stay clear of component styles) */
+.mt-page {
+    padding: 24px;
+    font-family: var(--font-body);
+    color: var(--text);
+}
+
+.mt-card {
+    background: var(--surface);
+    border: 1px solid var(--borders);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 1.25rem;
+}
+
+.mt-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.mt-search {
+    flex: 1 1 16rem;
+    height: 2.5rem;
+    padding: 0 0.9rem;
+    box-sizing: border-box;
+    border: 1px solid var(--borders);
+    border-radius: 12px;
+    background: var(--surface);
+    font-family: var(--font-body);
+    font-size: 1rem;
+}
+
+.mt-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.mt-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.mt-link {
+    color: var(--primary2);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.mt-muted {
+    color: var(--text-muted);
+}
+
+.mt-error {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    background: var(--error-container);
+    color: var(--alert);
+    font-size: 0.9rem;
+}
+
+.mt-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 899px) {
+    .mt-page {
+        padding: 16px;
+    }
+}
+
+/* Print view (invoice "Imprimir / PDF"): hide the app shell and everything marked no-print */
+@media print {
+    app-navbar,
+    app-header,
+    app-footer,
+    mt-toast-container,
+    mt-modal,
+    .no-print {
+        display: none !important;
+    }
+
+    html,
+    body {
+        background: #ffffff !important;
+    }
+
+    app-home {
+        display: block;
+    }
+
+    app-home > main.app-main {
+        display: block;
+    }
+
+    .mt-page {
+        padding: 0;
+    }
+
+    .mt-card {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+    }
+
+    .documento {
+        max-width: none !important;
+    }
+
+    @page {
+        margin: 14mm;
+    }
 }

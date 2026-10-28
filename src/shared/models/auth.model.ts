@@ -1,18 +1,15 @@
-import { User } from "./user.model";
-
-export interface LoginRequest {
-    email: string;
-    password: string;
+export interface SignInRequest {
+  email: string;
+  password: string;
 }
 
-export interface RegisterRequest {
-    name: string;
-    email: string;
-    company: string;
-    password: string;
+export interface SignUpRequest {
+  email: string;
+  password: string;
+  nombre: string;
 }
 
-export interface AuthResponse {
-    user: User;
-    // In Prodcution the token will be source from HttpOnly Cookie.
+export interface SignUpResult {
+  /** `true` cuando Supabase exige confirmar el correo antes de iniciar sesión. */
+  confirmarCorreo: boolean;
 }

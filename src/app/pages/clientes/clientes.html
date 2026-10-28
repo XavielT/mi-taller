@@ -1,0 +1,52 @@
+<div class="mt-page">
+  <mt-page-header title="Clientes" subtitle="Busca, crea y edita los clientes de tu taller.">
+    <a class="mt-link" routerLink="/home/recepcion">← Recibir vehículo</a>
+    <mt-button (click)="nuevo()">Nuevo cliente</mt-button>
+  </mt-page-header>
+
+  <div class="mt-toolbar">
+    <input
+      class="mt-search"
+      type="search"
+      placeholder="Buscar por nombre, teléfono o documento..."
+      aria-label="Buscar clientes"
+      [value]="busqueda()"
+      (input)="busqueda.set($any($event.target).value)"
+    />
+  </div>
+
+  <mt-table [columns]="columnas" [rows]="filas()" [loading]="cargando()">
+    <ng-template mtCell="nombre" let-row>
+      <a class="mt-link" [routerLink]="['/home/recepcion/clientes', row.id]">{{ row.nombre }}</a>
+    </ng-template>
+    <ng-template mtCell="telefono" let-row>{{ row.telefono || '—' }}</ng-template>
+    <ng-template mtCell="documento" let-row>{{ row.documento || '—' }}</ng-template>
+    <ng-template mtCell="acciones" let-row>
+      <mt-button variant="ghost" size="sm" (click)="editar(row)">Editar</mt-button>
+    </ng-template>
+    <div empty>
+      <mt-empty-state
+        [title]="busqueda() ? 'Sin resultados' : 'Aún no tienes clientes'"
+        [text]="busqueda() ? 'Prueba con otro nombre, teléfono o documento.' : 'Crea el primero o recibe un vehículo para registrarlo.'"
+      >
+        @if (!busqueda()) {
+          <mt-button (click)="nuevo()">Nuevo cliente</mt-button>
+        }
+      </mt-empty-state>
+    </div>
+  </mt-table>
+
+  @if (total() > tamano) {
+    <nav class="pager" aria-label="Paginación">
+      <mt-button variant="ghost" size="sm" [disabled]="pagina() <= 1" (click)="irAPagina(pagina() - 1)">Anterior</mt-button>
+      <span class="mt-muted">Página {{ pagina() }} de {{ paginas() }} · {{ total() }} clientes</span>
+      <mt-button variant="ghost" size="sm" [disabled]="pagina() >= paginas()" (click)="irAPagina(pagina() + 1)">Siguiente</mt-button>
+    </nav>
+  }
+</div>
+
+<mt-modal [open]="modalAbierto()" [title]="editando() ? 'Editar cliente' : 'Nuevo cliente'" (closed)="modalAbierto.set(false)">
+  @if (modalAbierto()) {
+    <app-cliente-form [cliente]="editando()" (guardado)="guardado($event)" (cancelado)="modalAbierto.set(false)" />
+  }
+</mt-modal>
