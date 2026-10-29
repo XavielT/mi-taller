@@ -43,6 +43,6 @@ Leyenda: `[x]` verificado sin base de datos (build, tests unitarios o revisión 
 
 ## Administrador de la plataforma (2026-10-29)
 - [x] Migraciones `005` (tabla `admins_plataforma`, RPCs `admin_*`, columna `talleres.activo`) y `006` (seed de `xavieldev@gmail.com`) aplicadas en x-core. Probadas en una transacción descartada: usuario normal rechazado, sin auto-promoción, el admin no ve datos de talleres, suspender bloquea escrituras y reactivar las restaura (13 verificaciones).
-- [ ] **Pendiente de Xaviel:** ejecutar `sql/2026-10-29_004_xcore_registro_abierto_mitaller.sql` en el SQL editor de x-core. Sin ella, `signUp` falla con "Sign-ups are invite-only" (trigger `enforce_invite_only`, de Music Hub).
+- [x] `sql/2026-10-29_004_xcore_registro_abierto_mitaller.sql` aplicada en x-core (2026-10-29, con autorización de Xaviel). Sin ella, `signUp` fallaba con "Sign-ups are invite-only" (trigger `enforce_invite_only`, de Music Hub).
 - [ ] Iniciar sesión con `xavieldev@gmail.com` → aparece el enlace "Administración" y `/admin` carga métricas, talleres y usuarios.
 - [ ] Cambiar el plan de un taller y suspenderlo/reactivarlo desde `/admin`.

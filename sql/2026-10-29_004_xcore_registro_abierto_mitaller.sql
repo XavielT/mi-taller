@@ -1,4 +1,4 @@
--- Mi Taller · 2026-10-29 · 004 · proyecto x-core (compartido) · NO APLICADA TODAVIA
+-- Mi Taller · 2026-10-29 · 004 · proyecto x-core (compartido) · aplicada el 2026-10-29
 -- OJO: modifica public.enforce_invite_only, que es de Music Hub. Solo agrega 'mitaller' a la lista de apps
 -- de registro abierto (igual que 'carguy'); el resto de la funcion queda identico al original del 2026-09-18.
 -- El registro abierto no otorga nada: el acceso a cada app lo controlan sus propias politicas RLS.
