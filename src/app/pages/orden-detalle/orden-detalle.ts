@@ -13,6 +13,8 @@ import {
   OrdenResumen,
   TRANSICIONES,
 } from '../../../shared/models/orden.model';
+import { ArticuloStock } from '../../../shared/models/articulo.model';
+import { ArticulosService } from '../../../shared/services/articulos.service';
 import { MAX_FOTOS, OrdenesService, errorFoto } from '../../../shared/services/ordenes.service';
 import { TallerStore } from '../../../shared/stores/taller.store';
 import { calcularTotales, importeItem } from '../../../shared/utils/totales';
@@ -43,6 +45,7 @@ export class OrdenDetalle implements OnInit {
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
   private svc = inject(OrdenesService);
+  private articulosSvc = inject(ArticulosService);
   private store = inject(TallerStore);
   private toast = inject(ToastService);
 
@@ -57,6 +60,8 @@ export class OrdenDetalle implements OnInit {
   fotos = signal<{ path: string; url: string }[]>([]);
   factura = signal<{ id: string; numero: string } | null>(null);
   mecanicos = signal<MtOption[]>([]);
+  /** Artículos activos del inventario para el selector de ítems (con su stock disponible). */
+  articulos = signal<ArticuloStock[]>([]);
   cargando = signal(true);
   error = signal<string | null>(null);
 
@@ -75,6 +80,7 @@ export class OrdenDetalle implements OnInit {
   subiendoFotos = signal(false);
 
   itemForm = this.fb.nonNullable.group({
+    articulo_id: [''],
     tipo: ['mano_obra' as 'mano_obra' | 'repuesto'],
     descripcion: ['', [Validators.required]],
     cantidad: [1, [Validators.required, Validators.min(0.01)]],
@@ -119,6 +125,7 @@ export class OrdenDetalle implements OnInit {
       this.factura.set(factura);
       void this.cargarFotos();
       void this.cargarMecanicos();
+      void this.cargarArticulos();
     } catch (e) {
       this.error.set(e instanceof Error ? e.message : 'No se pudo cargar la orden');
     } finally {
@@ -140,6 +147,21 @@ export class OrdenDetalle implements OnInit {
     } catch {
       // assignment select stays empty
     }
+  }
+
+  private async cargarArticulos(): Promise<void> {
+    try {
+      this.articulos.set(await this.articulosSvc.paraOrden());
+    } catch {
+      // the picker stays empty; items can still be typed by hand
+    }
+  }
+
+  /** Al elegir un artículo se rellenan tipo, descripción y precio; la cantidad se valida contra el stock en la base de datos. */
+  elegirArticulo(id: string): void {
+    const a = this.articulos().find((x) => x.id === id);
+    if (!a) return;
+    this.itemForm.patchValue({ articulo_id: a.id, tipo: 'repuesto', descripcion: a.nombre, precio_unitario: a.precio_venta });
   }
 
   private async cargarFotos(): Promise<void> {
@@ -223,10 +245,15 @@ export class OrdenDetalle implements OnInit {
     this.agregando.set(true);
     try {
       const v = this.itemForm.getRawValue();
-      const item = await this.svc.agregarItem(this.ordenId, { ...v, cantidad: Number(v.cantidad), precio_unitario: Number(v.precio_unitario) }, this.items().length + 1);
+      const item = await this.svc.agregarItem(
+        this.ordenId,
+        { ...v, articulo_id: v.articulo_id || null, cantidad: Number(v.cantidad), precio_unitario: Number(v.precio_unitario) },
+        this.items().length + 1,
+      );
       this.items.update((l) => [...l, item]);
-      this.itemForm.reset({ tipo: v.tipo, descripcion: '', cantidad: 1, precio_unitario: 0, aplica_itbis: true });
+      this.itemForm.reset({ articulo_id: '', tipo: v.tipo, descripcion: '', cantidad: 1, precio_unitario: 0, aplica_itbis: true });
       await this.refrescarResumen();
+      void this.cargarArticulos();
     } catch (e) {
       this.toast.error(e instanceof Error ? e.message : 'No se pudo agregar el ítem');
     } finally {
@@ -239,6 +266,7 @@ export class OrdenDetalle implements OnInit {
       const guardado = await this.svc.actualizarItem(item.id, cambios);
       this.items.update((l) => l.map((x) => (x.id === guardado.id ? guardado : x)));
       await this.refrescarResumen();
+      if (guardado.articulo_id) void this.cargarArticulos();
     } catch (e) {
       this.toast.error(e instanceof Error ? e.message : 'No se pudo guardar el ítem');
       this.items.set(await this.svc.items(this.ordenId)); // snap back to what the DB has
@@ -271,6 +299,7 @@ export class OrdenDetalle implements OnInit {
       await this.svc.eliminarItem(item.id);
       this.items.update((l) => l.filter((x) => x.id !== item.id));
       await this.refrescarResumen();
+      if (item.articulo_id) void this.cargarArticulos();
     } catch (e) {
       this.toast.error(e instanceof Error ? e.message : 'No se pudo eliminar el ítem');
     }

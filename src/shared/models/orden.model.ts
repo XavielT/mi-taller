@@ -137,4 +137,6 @@ export interface ItemInput {
   cantidad: number;
   precio_unitario: number;
   aplica_itbis: boolean;
+  /** Artículo del inventario: al guardarse, la base de datos descuenta la cantidad del stock. */
+  articulo_id?: string | null;
 }

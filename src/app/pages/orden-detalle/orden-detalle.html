@@ -123,6 +123,9 @@
                   } @else {
                     {{ i.descripcion }}
                   }
+                  @if (i.articulo_id) {
+                    <span class="mt-muted" title="Descuenta del inventario">📦 inventario</span>
+                  }
                 </td>
                 <td class="num">
                   @if (editable()) {
@@ -157,6 +160,14 @@
 
       @if (editable()) {
         <form class="nuevo-item" [formGroup]="itemForm" (ngSubmit)="agregarItem()" novalidate>
+          @if (articulos().length) {
+            <select aria-label="Artículo del inventario" [value]="itemForm.controls.articulo_id.value" (change)="elegirArticulo($any($event.target).value)">
+              <option value="">Del inventario (opcional)</option>
+              @for (a of articulos(); track a.id) {
+                <option [value]="a.id">{{ a.nombre }} · stock {{ a.stock }}</option>
+              }
+            </select>
+          }
           <select formControlName="tipo" aria-label="Tipo">
             <option value="mano_obra">Mano de obra</option>
             <option value="repuesto">Repuesto</option>

@@ -1,0 +1,76 @@
+<div class="mt-page">
+  <mt-page-header title="Inventario" subtitle="Piezas y repuestos. El stock baja solo al usarlas en una orden.">
+    <mt-button (click)="nuevo()">Nuevo artículo</mt-button>
+  </mt-page-header>
+
+  <div class="mt-toolbar">
+    <input
+      class="mt-search"
+      type="search"
+      placeholder="Buscar por nombre o código..."
+      aria-label="Buscar artículos"
+      [value]="busqueda()"
+      (input)="busqueda.set($any($event.target).value)"
+    />
+    <button type="button" class="filtro" [class.filtro--on]="soloBajoMinimo()" (click)="alternarFiltro('bajo')">Stock bajo</button>
+    <button type="button" class="filtro" [class.filtro--on]="incluirInactivos()" (click)="alternarFiltro('inactivos')">Ver desactivados</button>
+  </div>
+
+  <mt-table [columns]="columnas" [rows]="filas()" [loading]="cargando()">
+    <ng-template mtCell="codigo" let-row>{{ row.codigo || '—' }}</ng-template>
+    <ng-template mtCell="nombre" let-row>
+      <strong>{{ row.nombre }}</strong>
+      @if (!row.activo) {
+        <span class="chip chip--off">Desactivado</span>
+      }
+      @if (row.descripcion) {
+        <div class="mt-muted">{{ row.descripcion }}</div>
+      }
+    </ng-template>
+    <ng-template mtCell="precio_venta" let-row>{{ row.precio_venta | currency }}</ng-template>
+    <ng-template mtCell="costo" let-row>{{ row.costo | currency }}</ng-template>
+    <ng-template mtCell="stock" let-row>
+      <span class="stock" [class.stock--bajo]="row.bajo_minimo">{{ row.stock }}</span>
+      @if (row.bajo_minimo) {
+        <div class="mt-muted">mínimo {{ row.stock_minimo }}</div>
+      }
+    </ng-template>
+    <ng-template mtCell="acciones" let-row>
+      <div class="acciones">
+        <mt-button variant="ghost" size="sm" (click)="moviendo.set(row)">Movimientos</mt-button>
+        <mt-button variant="ghost" size="sm" (click)="editar(row)">Editar</mt-button>
+        <mt-button variant="ghost" size="sm" (click)="alternarActivo(row)">{{ row.activo ? 'Desactivar' : 'Activar' }}</mt-button>
+      </div>
+    </ng-template>
+    <div empty>
+      <mt-empty-state
+        [title]="busqueda() || soloBajoMinimo() ? 'Sin resultados' : 'Aún no tienes artículos'"
+        [text]="busqueda() || soloBajoMinimo() ? 'Prueba con otro nombre o quita los filtros.' : 'Registra tus repuestos para que el stock se descuente solo al usarlos en una orden.'"
+      >
+        @if (!busqueda() && !soloBajoMinimo()) {
+          <mt-button (click)="nuevo()">Crear el primero</mt-button>
+        }
+      </mt-empty-state>
+    </div>
+  </mt-table>
+
+  @if (total() > tamano) {
+    <nav class="pager" aria-label="Paginación">
+      <mt-button variant="ghost" size="sm" [disabled]="pagina() <= 1" (click)="irAPagina(pagina() - 1)">Anterior</mt-button>
+      <span class="mt-muted">Página {{ pagina() }} de {{ paginas() }} · {{ total() }} artículos</span>
+      <mt-button variant="ghost" size="sm" [disabled]="pagina() >= paginas()" (click)="irAPagina(pagina() + 1)">Siguiente</mt-button>
+    </nav>
+  }
+</div>
+
+<mt-modal [open]="formAbierto()" [title]="editando() ? 'Editar artículo' : 'Nuevo artículo'" (closed)="formAbierto.set(false)">
+  @if (formAbierto()) {
+    <app-articulo-form [articulo]="editando()" (guardado)="guardado()" (cancelado)="formAbierto.set(false)" />
+  }
+</mt-modal>
+
+<mt-modal [open]="moviendo() !== null" title="Movimientos de inventario" (closed)="moviendo.set(null)">
+  @if (moviendo()) {
+    <app-movimiento-form [articulo]="moviendo()" (registrado)="movimientoRegistrado()" (cerrado)="moviendo.set(null)" />
+  }
+</mt-modal>

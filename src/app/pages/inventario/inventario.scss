@@ -1,0 +1,54 @@
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.filtro {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--borders);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  &--on {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--titles);
+  }
+}
+
+.acciones {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.stock {
+  font-weight: 600;
+
+  &--bajo {
+    color: var(--alert);
+  }
+}
+
+.chip {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: var(--input-bg);
+
+  &--off {
+    background: var(--alert);
+    color: var(--titles);
+  }
+}
