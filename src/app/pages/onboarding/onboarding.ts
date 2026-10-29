@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../shared/services/auth.service';
 import { TalleresService } from '../../../shared/services/talleres.service';
 import { CLAVE_TALLER_PENDIENTE } from '../../../shared/storage-keys';
@@ -21,7 +21,7 @@ function nombreInicial(): string {
 @Component({
   standalone: true,
   selector: 'app-onboarding',
-  imports: [ReactiveFormsModule, MtInput, MtButton],
+  imports: [ReactiveFormsModule, RouterLink, MtInput, MtButton],
   templateUrl: './onboarding.html',
   styleUrls: ['./onboarding.scss'],
 })
@@ -29,7 +29,7 @@ export class Onboarding {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
   private talleres = inject(TalleresService);
-  private store = inject(TallerStore);
+  readonly store = inject(TallerStore);
   private router = inject(Router);
 
   isLoading = signal(false);

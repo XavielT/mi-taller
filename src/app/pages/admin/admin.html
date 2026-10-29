@@ -2,6 +2,8 @@
   <mt-page-header title="Administración de la plataforma" subtitle="Talleres, planes y usuarios de Mi Taller.">
     @if (store.talleres().length) {
       <a class="mt-link" routerLink="/home">Ir a mi taller →</a>
+    } @else {
+      <a class="mt-link" routerLink="/onboarding">Crear mi taller →</a>
     }
     <mt-button variant="ghost" (click)="auth.signOut()">Cerrar sesión</mt-button>
   </mt-page-header>

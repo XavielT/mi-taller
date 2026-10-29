@@ -19,6 +19,9 @@
             </mt-button>
         </form>
 
+        @if (store.esAdminPlataforma()) {
+            <a class="onboarding__link" routerLink="/admin">← Volver a administración</a>
+        }
         <button type="button" class="onboarding__link" (click)="cerrarSesion()">Cerrar sesión</button>
     </div>
 </div>
