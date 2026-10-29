@@ -39,6 +39,8 @@ export class TallerStore {
   readonly cargando = signal(false);
   /** true after the first `cargar()` finished (successfully or not), so guards do not reload on every navigation. */
   readonly cargado = signal(false);
+  /** true si el usuario figura en `admins_plataforma` (dueño del SaaS); habilita la ruta /admin. */
+  readonly esAdminPlataforma = signal(false);
 
   /** Active taller id; every domain service scopes its queries with it. */
   readonly tallerId = computed(() => this.tallerActivo()?.id ?? null);
@@ -59,7 +61,9 @@ export class TallerStore {
   async cargar(preferirId?: string): Promise<void> {
     this.cargando.set(true);
     try {
-      const { data, error } = await this.client.rpc('mis_talleres');
+      const [talleres, admin] = await Promise.all([this.client.rpc('mis_talleres'), this.client.rpc('es_admin_plataforma')]);
+      this.esAdminPlataforma.set(admin.data === true);
+      const { data, error } = talleres;
       if (error) throw aError(error, 'No se pudieron cargar tus talleres');
       const lista = (data ?? []) as Taller[];
       this.talleres.set(lista);
@@ -86,6 +90,7 @@ export class TallerStore {
     this.sucursalActiva.set(null);
     this.rol.set(null);
     this.plan.set(null);
+    this.esAdminPlataforma.set(false);
     this.cargado.set(false);
     guardar(null);
   }

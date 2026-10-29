@@ -71,6 +71,17 @@ describe('TallerStore', () => {
     expect(localStorage.getItem(CLAVE_TALLER_ACTIVO)).toBeNull();
   });
 
+  it('is not a platform admin unless the RPC answers exactly true', async () => {
+    await store.cargar();
+    expect(store.esAdminPlataforma()).toBe(false);
+  });
+
+  it('limpiar() resets the platform admin flag', async () => {
+    store.esAdminPlataforma.set(true);
+    store.limpiar();
+    expect(store.esAdminPlataforma()).toBe(false);
+  });
+
   it('requerirTallerId throws without an active taller', () => {
     expect(() => store.requerirTallerId()).toThrow('No hay un taller activo');
   });

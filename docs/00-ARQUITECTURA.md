@@ -95,3 +95,13 @@ Paleta y fuentes de `styles.scss` (navy `--primary #002547`, naranja `--secondar
 
 ## 8. Backlog arquitectónico
 Inventario con descuento automático · sucursales múltiples en UI · citas y recordatorios · cotizaciones con aprobación por link · NCF automáticos y 606/607/e-CF · cobro de planes · landing pública · portal del cliente · PWA para mecánicos · migración a proyecto Supabase propio.
+
+
+## Administrador de la plataforma
+Nivel por encima de los roles de cada taller: usuarios listados en `mitaller.admins_plataforma` (sin `taller_id`, no es tabla de negocio). Se agregan solo con SQL; ningún cliente puede escribir en la tabla.
+- No ve los datos de los talleres (clientes, órdenes, facturas). Solo métricas agregadas y acciones por RPC `security definer` que llaman a `exigir_admin_plataforma()`: `admin_resumen`, `admin_listar_talleres`, `admin_listar_usuarios` (solo usuarios con membresía o perfil de Mi Taller, porque `auth.users` es compartido), `admin_cambiar_plan`, `admin_activar_taller`.
+- Suspender un taller (`talleres.activo = false`) hace que `es_miembro` y `rol_en_taller` devuelvan falso: el RLS bloquea lectura y escritura. `mis_talleres` lo sigue listando para mostrar `/suspendido`.
+- Frontend: ruta `/admin` con `adminGuard`; `TallerStore.esAdminPlataforma` se carga junto a los talleres. Un admin sin taller entra directo a `/admin` en lugar de `/onboarding`.
+
+## Registro en el proyecto compartido x-core
+El trigger `public.enforce_invite_only` (Music Hub) rechaza registros salvo correo permitido, invitación o `raw_user_meta_data.app` autorizado. Mi Taller envía `app: 'mitaller'` y requiere agregarlo a esa lista (migración `004`). Mover Mi Taller a su propio proyecto elimina esta dependencia.

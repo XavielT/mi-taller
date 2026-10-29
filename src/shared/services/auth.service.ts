@@ -16,6 +16,7 @@ export function mensajeAuth(message: string | undefined): string {
   if (m.includes('password should be at least')) return 'La contraseña debe tener al menos 6 caracteres';
   if (m.includes('rate limit') || m.includes('too many')) return 'Demasiados intentos. Espera un momento e intenta de nuevo.';
   if (m.includes('failed to fetch') || m.includes('network')) return 'No hay conexión con el servidor. Revisa tu internet.';
+  if (m.includes('invite-only')) return 'El registro de nuevas cuentas aún no está habilitado. Contacta al administrador.';
   if (m.includes('same password')) return 'La nueva contraseña debe ser distinta a la actual';
   return GENERICO;
 }
@@ -57,7 +58,8 @@ export class AuthService {
   }
 
   async signUp({ email, password, nombre }: SignUpRequest): Promise<SignUpResult> {
-    const { data, error } = await this.client.auth.signUp({ email, password, options: { data: { nombre } } });
+    // `app` identifies Mi Taller to the shared x-core project: its sign-up trigger only lets flagged apps register openly.
+    const { data, error } = await this.client.auth.signUp({ email, password, options: { data: { nombre, app: 'mitaller' } } });
     if (error) throw new Error(mensajeAuth(error.message));
     // With email confirmation on, an already-registered address comes back as a user without identities.
     if (data.user && (data.user.identities?.length ?? 1) === 0) {

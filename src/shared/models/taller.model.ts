@@ -18,6 +18,8 @@ export interface Taller {
   logo_url: string | null;
   contadores: { orden: number; factura: number };
   config: TallerConfig;
+  /** false cuando el administrador de la plataforma suspendió el taller. */
+  activo: boolean;
   creado_por: string | null;
   created_at: string;
   updated_at: string | null;

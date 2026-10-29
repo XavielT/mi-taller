@@ -19,6 +19,11 @@
 				</a>
 			</li>
 		}
+		@if (store.esAdminPlataforma()) {
+			<li>
+				<a routerLink="/admin" routerLinkActive="active" (click)="closed.emit()">Administración</a>
+			</li>
+		}
 	</ul>
 
 	<div class="sidebar__actions">

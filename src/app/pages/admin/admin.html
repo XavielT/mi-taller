@@ -1,0 +1,112 @@
+<div class="mt-page">
+  <mt-page-header title="Administración de la plataforma" subtitle="Talleres, planes y usuarios de Mi Taller.">
+    @if (store.talleres().length) {
+      <a class="mt-link" routerLink="/home">Ir a mi taller →</a>
+    }
+    <mt-button variant="ghost" (click)="auth.signOut()">Cerrar sesión</mt-button>
+  </mt-page-header>
+
+  @if (error(); as msg) {
+    <div class="mt-error" role="alert">{{ msg }}</div>
+  }
+
+  @if (resumen(); as r) {
+    <section class="kpis" aria-label="Indicadores">
+      <div class="mt-card kpi">
+        <span class="kpi__label">Talleres</span>
+        <strong>{{ r.talleres }}</strong>
+        <span class="kpi__sub">{{ r.talleres_activos }} activos</span>
+      </div>
+      <div class="mt-card kpi">
+        <span class="kpi__label">Usuarios</span>
+        <strong>{{ r.usuarios }}</strong>
+      </div>
+      <div class="mt-card kpi">
+        <span class="kpi__label">Órdenes del mes</span>
+        <strong>{{ r.ordenes_mes }}</strong>
+      </div>
+      <div class="mt-card kpi">
+        <span class="kpi__label">Facturado del mes</span>
+        <strong>{{ r.facturado_mes | currency }}</strong>
+      </div>
+      <div class="mt-card kpi">
+        <span class="kpi__label">Suscripciones por plan</span>
+        @for (p of porPlan(); track p[0]) {
+          <span class="kpi__sub">{{ p[0] }}: {{ p[1] }}</span>
+        } @empty {
+          <span class="kpi__sub">Sin suscripciones</span>
+        }
+      </div>
+    </section>
+  }
+
+  <h2 class="seccion">Talleres</h2>
+  <mt-table [columns]="columnasTalleres" [rows]="talleres()" [loading]="cargando()">
+    <ng-template mtCell="nombre" let-row>
+      <strong>{{ row.nombre }}</strong>
+      <div class="mt-muted">{{ row.rnc || 'Sin RNC' }} · creado {{ row.created_at | date: 'dd/MM/yyyy' }}</div>
+    </ng-template>
+    <ng-template mtCell="propietario" let-row>{{ row.propietario || '—' }}</ng-template>
+    <ng-template mtCell="plan" let-row>
+      <select
+        class="mt-search plan"
+        [attr.aria-label]="'Plan de ' + row.nombre"
+        (change)="cambiarPlan(row, $any($event.target).value)"
+      >
+        @for (p of planes(); track p.id) {
+          <option [value]="p.id" [selected]="p.id === row.plan_id">{{ p.nombre }}</option>
+        }
+      </select>
+    </ng-template>
+    <ng-template mtCell="uso" let-row>
+      {{ row.ordenes_mes }} órd. este mes
+      <div class="mt-muted">{{ row.miembros }} miembros · {{ row.facturas }} facturas</div>
+    </ng-template>
+    <ng-template mtCell="estado" let-row>
+      <span class="chip" [class.chip--off]="!row.activo">{{ row.activo ? 'Activo' : 'Suspendido' }}</span>
+    </ng-template>
+    <ng-template mtCell="acciones" let-row>
+      <mt-button [variant]="row.activo ? 'ghost' : 'secondary'" size="sm" (click)="pedirConfirmacion(row)">
+        {{ row.activo ? 'Suspender' : 'Reactivar' }}
+      </mt-button>
+    </ng-template>
+    <div empty>
+      <mt-empty-state title="Aún no hay talleres" text="Cuando alguien cree su taller aparecerá aquí." />
+    </div>
+  </mt-table>
+
+  <h2 class="seccion">Usuarios</h2>
+  <mt-table [columns]="columnasUsuarios" [rows]="usuarios()" [loading]="cargando()">
+    <ng-template mtCell="nombre" let-row>
+      <strong>{{ row.nombre || 'Sin nombre' }}</strong>
+      <div class="mt-muted">{{ row.email }}</div>
+    </ng-template>
+    <ng-template mtCell="roles" let-row>{{ row.roles || '—' }}</ng-template>
+    <ng-template mtCell="ultimo_acceso" let-row>{{ row.ultimo_acceso ? (row.ultimo_acceso | date: 'dd/MM/yyyy HH:mm') : 'Nunca' }}</ng-template>
+    <div empty>
+      <mt-empty-state title="Aún no hay usuarios" text="Aquí aparecen quienes pertenecen a un taller de Mi Taller." />
+    </div>
+  </mt-table>
+</div>
+
+<mt-modal
+  [open]="confirmando() !== null"
+  [title]="confirmando()?.activo ? 'Suspender taller' : 'Reactivar taller'"
+  (closed)="confirmando.set(null)"
+>
+  @if (confirmando(); as t) {
+    <p>
+      @if (t.activo) {
+        ¿Suspender <strong>{{ t.nombre }}</strong>? Sus {{ t.miembros }} miembros no podrán entrar ni ver sus datos hasta que lo reactives. No se borra nada.
+      } @else {
+        ¿Reactivar <strong>{{ t.nombre }}</strong>? Sus miembros recuperarán el acceso de inmediato.
+      }
+    </p>
+    <div class="mt-actions">
+      <mt-button variant="ghost" (click)="confirmando.set(null)">Cancelar</mt-button>
+      <mt-button [variant]="t.activo ? 'danger' : 'primary'" [loading]="guardando()" (click)="confirmar()">
+        {{ t.activo ? 'Suspender' : 'Reactivar' }}
+      </mt-button>
+    </div>
+  }
+</mt-modal>

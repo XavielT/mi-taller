@@ -3,7 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { TallerStore } from '../stores/taller.store';
 
-/** Loads the taller store when empty; users with no taller are sent to /onboarding. */
+/** Loads the taller store when empty; users with no taller go to /onboarding (platform admins to /admin), suspended tallers to /suspendido. */
 export const tallerGuard: CanActivateFn = async () => {
   const auth = inject(AuthService);
   const store = inject(TallerStore);
@@ -19,5 +19,7 @@ export const tallerGuard: CanActivateFn = async () => {
       console.error(e);
     }
   }
-  return store.tallerActivo() ? true : router.createUrlTree(['/onboarding']);
+  const taller = store.tallerActivo();
+  if (!taller) return router.createUrlTree([store.esAdminPlataforma() ? '/admin' : '/onboarding']);
+  return taller.activo === false ? router.createUrlTree(['/suspendido']) : true;
 };

@@ -1,6 +1,7 @@
-import { Component, input, output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { TallerStore } from '../../stores/taller.store';
 
 interface NavItem {
   path: string;
@@ -30,6 +31,8 @@ export class Navbar {
     { path: '/home/inventario', label: 'Inventario', icon: 'assets/icons/inventario-icon.svg' },
     { path: '/home/sucursales', label: 'Sucursales', icon: 'assets/icons/sucursales-icon.svg' },
   ];
+
+  readonly store = inject(TallerStore);
 
   constructor(private auth: AuthService) {}
 

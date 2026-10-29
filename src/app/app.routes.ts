@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from '../shared/guards/admin.guard';
 import { authGuard } from '../shared/guards/auth.guard';
 import { guestGuard } from '../shared/guards/guest.guard';
 import { tallerGuard } from '../shared/guards/taller.guard';
@@ -11,6 +12,16 @@ export const routes: Routes = [
   {
     path: 'onboarding',
     loadComponent: () => import('./pages/onboarding/onboarding').then((m) => m.Onboarding),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'admin',
+    loadComponent: () => import('./pages/admin/admin').then((m) => m.Admin),
+    canActivate: [authGuard, adminGuard],
+  },
+  {
+    path: 'suspendido',
+    loadComponent: () => import('./pages/suspendido/suspendido').then((m) => m.Suspendido),
     canActivate: [authGuard],
   },
   {

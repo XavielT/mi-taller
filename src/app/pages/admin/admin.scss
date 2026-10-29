@@ -1,0 +1,55 @@
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  strong {
+    font-family: var(--font-titles);
+    font-size: 1.6rem;
+    color: var(--text);
+  }
+}
+
+.kpi__label {
+  font-family: var(--font-subtitles);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.kpi__sub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.seccion {
+  margin: 1.5rem 0 0.75rem;
+  font-family: var(--font-titles);
+  font-size: 1.15rem;
+}
+
+.plan {
+  width: auto;
+  min-width: 7rem;
+}
+
+.chip {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  background: var(--input-bg);
+  color: var(--text);
+
+  &--off {
+    background: var(--alert);
+    color: var(--titles);
+  }
+}
