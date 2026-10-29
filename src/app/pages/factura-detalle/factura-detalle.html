@@ -21,6 +21,9 @@
     <article class="mt-card documento">
       <header class="documento__cab">
         <div class="emisor">
+          @if (taller()?.logo_url) {
+            <img class="logo-impresion" [src]="taller()?.logo_url" alt="" />
+          }
           <h2>{{ taller()?.nombre }}</h2>
           @if (taller()?.rnc) {
             <div>RNC: {{ taller()?.rnc }}</div>

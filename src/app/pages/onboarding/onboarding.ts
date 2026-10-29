@@ -3,7 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../shared/services/auth.service';
 import { TalleresService } from '../../../shared/services/talleres.service';
-import { CLAVE_TALLER_PENDIENTE } from '../../../shared/storage-keys';
+import { CLAVE_INVITACION_PENDIENTE, CLAVE_TALLER_PENDIENTE } from '../../../shared/storage-keys';
 import { TallerStore } from '../../../shared/stores/taller.store';
 import { MtButton, MtInput } from '../../../shared/ui';
 
@@ -41,6 +41,27 @@ export class Onboarding {
     telefono: [''],
     direccion: [''],
   });
+
+  constructor() {
+    void this.revisarInvitacion();
+  }
+
+  /** Someone who arrived through an invitation link already belongs to a taller: skip creating a new one. */
+  private async revisarInvitacion(): Promise<void> {
+    let pendiente = false;
+    try {
+      pendiente = !!localStorage.getItem(CLAVE_INVITACION_PENDIENTE);
+    } catch {
+      return;
+    }
+    if (!pendiente) return;
+    try {
+      await this.store.cargar();
+      if (this.store.tallerActivo()) await this.router.navigate(['/home']);
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
   async onSubmit(): Promise<void> {
     if (this.form.invalid) {

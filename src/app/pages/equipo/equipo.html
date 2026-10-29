@@ -1,0 +1,133 @@
+<div class="mt-page">
+  <mt-page-header title="Equipo" subtitle="Quiénes trabajan en tu taller y qué pueden hacer.">
+    @if (esAdmin()) {
+      <mt-button [disabled]="llegoAlLimite()" (click)="abrirInvitar()">Invitar persona</mt-button>
+    }
+  </mt-page-header>
+
+  @if (limite() !== null) {
+    <p class="mt-muted limite" [class.limite--tope]="llegoAlLimite()">
+      Tu plan permite {{ limite() }} usuarios (las invitaciones pendientes cuentan): usas {{ ocupados() }}.
+      @if (llegoAlLimite() && esAdmin()) {
+        Para agregar más, mejora tu plan.
+      }
+    </p>
+  }
+
+  @if (error(); as msg) {
+    <div class="mt-error" role="alert">{{ msg }}</div>
+  }
+
+  <mt-table [columns]="columnas" [rows]="miembros()" [loading]="cargando()">
+    <ng-template mtCell="miembro" let-row>
+      <strong>{{ row.nombre || 'Sin nombre' }}</strong>
+      @if (row.user_id === miId()) {
+        <span class="chip">Tú</span>
+      }
+      <div class="mt-muted">{{ row.email || '—' }}</div>
+    </ng-template>
+    <ng-template mtCell="rol" let-row>
+      @if (puedeEditar(row)) {
+        <select [attr.aria-label]="'Rol de ' + (row.nombre || row.email)" (change)="cambiarRol(row, $any($event.target).value)">
+          @for (r of rolesAsignables(); track r) {
+            <option [value]="r" [selected]="r === row.rol">{{ etiqueta[r] }}</option>
+          }
+        </select>
+      } @else {
+        {{ nombreRol(row.rol) }}
+      }
+    </ng-template>
+    <ng-template mtCell="sucursal" let-row>
+      @if (puedeEditar(row) && sucursalesActivas().length > 1) {
+        <select [attr.aria-label]="'Sucursal de ' + (row.nombre || row.email)" (change)="cambiarSucursal(row, $any($event.target).value)">
+          @for (s of sucursalesActivas(); track s.id) {
+            <option [value]="s.id" [selected]="s.id === row.sucursal_id">{{ s.nombre }}</option>
+          }
+        </select>
+      } @else {
+        {{ nombreSucursal(row.sucursal_id) }}
+      }
+    </ng-template>
+    <ng-template mtCell="acciones" let-row>
+      @if (puedeEditar(row)) {
+        <mt-button variant="ghost" size="sm" (click)="pedirQuitar(row)">Quitar</mt-button>
+      }
+    </ng-template>
+    <div empty>
+      <mt-empty-state title="Sin miembros" text="Recarga la página si no ves a nadie." />
+    </div>
+  </mt-table>
+
+  @if (esAdmin() && invitaciones().length) {
+    <h2 class="seccion">Invitaciones pendientes</h2>
+    <mt-table [columns]="columnasInv" [rows]="invitaciones()">
+      <ng-template mtCell="para" let-row>{{ row.etiqueta || 'Sin nombre' }}</ng-template>
+      <ng-template mtCell="rol" let-row>{{ nombreRol(row.rol) }}</ng-template>
+      <ng-template mtCell="vence" let-row>{{ row.expira_en | date: 'dd/MM/yyyy' }}</ng-template>
+      <ng-template mtCell="acciones" let-row>
+        <mt-button variant="ghost" size="sm" (click)="cancelar(row)">Cancelar</mt-button>
+      </ng-template>
+    </mt-table>
+    <p class="mt-muted nota">Por seguridad el enlace solo se muestra al crearlo. Si lo perdiste, cancela la invitación y crea otra.</p>
+  }
+</div>
+
+<mt-modal [open]="invitando()" title="Invitar persona" (closed)="invitando.set(false)">
+  @if (invitando()) {
+    @if (enlace(); as e) {
+      <div class="mt-stack">
+        <p>La invitación está lista. Comparte este enlace con la persona; funciona una sola vez y vence el {{ e.vence | date: 'dd/MM/yyyy' }}.</p>
+        <input class="mt-search" readonly [value]="e.url" aria-label="Enlace de invitación" (focus)="$any($event.target).select()" />
+        <p class="mt-muted">Este enlace no se vuelve a mostrar. Quien lo abra podrá iniciar sesión o crear su cuenta y entrará a tu taller.</p>
+        <div class="mt-actions">
+          <mt-button variant="ghost" (click)="copiar(e.url)">Copiar enlace</mt-button>
+          <a class="btn-link" [href]="whatsapp(e.url)" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+          <mt-button (click)="invitando.set(false)">Listo</mt-button>
+        </div>
+      </div>
+    } @else {
+      <form class="mt-stack" (ngSubmit)="crearInvitacion()">
+        <div class="campo">
+          <label for="inv-rol">Rol</label>
+          <select id="inv-rol" name="rol" [ngModel]="nuevoRol()" (ngModelChange)="nuevoRol.set($event)">
+            @for (r of rolesAsignables(); track r) {
+              <option [value]="r">{{ etiqueta[r] }}</option>
+            }
+          </select>
+        </div>
+        <div class="campo">
+          <label for="inv-nombre">Nombre o nota (opcional)</label>
+          <input id="inv-nombre" name="etiqueta" class="mt-search" placeholder="Ej: Pedro, mecánico" [ngModel]="nuevaEtiqueta()" (ngModelChange)="nuevaEtiqueta.set($event)" />
+        </div>
+        @if (sucursalesActivas().length > 1) {
+          <div class="campo">
+            <label for="inv-suc">Sucursal</label>
+            <select id="inv-suc" name="sucursal" [ngModel]="nuevaSucursal()" (ngModelChange)="nuevaSucursal.set($event)">
+              <option value="">Principal</option>
+              @for (s of sucursalesActivas(); track s.id) {
+                <option [value]="s.id">{{ s.nombre }}</option>
+              }
+            </select>
+          </div>
+        }
+        @if (errorInvitar(); as msg) {
+          <div class="mt-error" role="alert">{{ msg }}</div>
+        }
+        <div class="mt-actions">
+          <mt-button variant="ghost" (click)="invitando.set(false)">Cancelar</mt-button>
+          <mt-button type="submit" [loading]="creando()">Crear invitación</mt-button>
+        </div>
+      </form>
+    }
+  }
+</mt-modal>
+
+<mt-modal [open]="quitando() !== null" title="Quitar del equipo" (closed)="quitando.set(null)">
+  @if (quitando(); as m) {
+    <p>¿Quitar a <strong>{{ m.nombre || m.email }}</strong>? Perderá el acceso al taller de inmediato. Sus órdenes y registros se conservan.</p>
+    <div class="mt-actions">
+      <mt-button variant="ghost" (click)="quitando.set(null)">Cancelar</mt-button>
+      <mt-button variant="danger" [loading]="confirmandoQuitar()" (click)="confirmarQuitar()">Quitar</mt-button>
+    </div>
+  }
+</mt-modal>

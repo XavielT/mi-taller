@@ -3,7 +3,7 @@
 }
 <aside class="sidebar" [class.sidebar--open]="open()">
 	<div class="sidebar__brand">
-		<img src="/assets/imgs/auth/mi-taller-logo.png" alt="logo" class="sidebar__logo" />
+		<img [src]="logo()" alt="logo" class="sidebar__logo" />
 		<div>
 			<div class="sidebar__title">{{ tallerNombre() }}</div>
 			<div class="sidebar__subtitle">{{ sucursalNombre() }}</div>
@@ -11,17 +11,12 @@
 	</div>
 
 	<ul class="sidebar__nav">
-		@for (item of items; track item.path) {
+		@for (item of items(); track item.path) {
 			<li>
 				<a [routerLink]="item.path" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closed.emit()">
 					<img [src]="item.icon" width="20" height="20" alt="" />
 					{{ item.label }}
 				</a>
-			</li>
-		}
-		@if (store.esAdminPlataforma()) {
-			<li>
-				<a routerLink="/admin" routerLinkActive="active" (click)="closed.emit()">Administración</a>
 			</li>
 		}
 	</ul>

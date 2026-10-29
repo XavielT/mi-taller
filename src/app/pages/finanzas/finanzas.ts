@@ -7,6 +7,8 @@ import { debounceTime, distinctUntilChanged, skip } from 'rxjs';
 import { FacturaResumen, ResumenFinanzas } from '../../../shared/models/factura.model';
 import { FacturasService, FiltroEstado } from '../../../shared/services/facturas.service';
 import { FinanzasService } from '../../../shared/services/finanzas.service';
+import { ReportesService } from '../../../shared/services/reportes.service';
+import { descargarArchivo } from '../../../shared/utils/csv';
 import { TallerStore } from '../../../shared/stores/taller.store';
 import { hoyISO, inicioMesISO } from '../../../shared/utils/fechas';
 import { MtBadgeEstado, MtButton, MtCell, MtEmptyState, MtModal, MtPageHeader, MtTable, ToastService } from '../../../shared/ui';
@@ -40,6 +42,11 @@ export class Finanzas implements OnInit {
   private finanzasSvc = inject(FinanzasService);
   private store = inject(TallerStore);
   private toast = inject(ToastService);
+  private reportes = inject(ReportesService);
+
+  /** Mes (yyyy-mm) de los reportes descargables; por defecto el actual. */
+  mesExport = signal(hoyISO().slice(0, 7));
+  exportando = signal(false);
 
   readonly chips: { valor: FiltroEstado; etiqueta: string }[] = [
     { valor: 'todas', etiqueta: 'Todas' },
@@ -88,6 +95,30 @@ export class Finanzas implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await Promise.all([this.cargarResumen(), this.cargarFacturas()]);
+  }
+
+  async exportar(tipo: '607' | 'facturas'): Promise<void> {
+    const mes = this.mesExport();
+    if (!/^\d{4}-\d{2}$/.test(mes)) {
+      this.toast.error('Elige un mes para exportar');
+      return;
+    }
+    this.exportando.set(true);
+    try {
+      const r = tipo === '607' ? await this.reportes.exportar607(mes) : await this.reportes.exportarFacturas(mes);
+      if (r.incluidas === 0) {
+        this.toast.error(tipo === '607' ? 'No hay facturas con NCF en ese mes' : 'No hay facturas en ese mes');
+        return;
+      }
+      descargarArchivo(tipo === '607' ? `607-${mes}.csv` : `facturas-${mes}.csv`, r.csv);
+      this.toast.success(
+        r.omitidas > 0 ? `Descargado. ${r.omitidas} factura(s) sin NCF no se incluyeron en el 607.` : `Descargado (${r.incluidas} filas)`,
+      );
+    } catch (e) {
+      this.toast.error(e instanceof Error ? e.message : 'No se pudo exportar');
+    } finally {
+      this.exportando.set(false);
+    }
   }
 
   private async cargarResumen(): Promise<void> {

@@ -18,6 +18,7 @@ import { ArticulosService } from '../../../shared/services/articulos.service';
 import { MAX_FOTOS, OrdenesService, errorFoto } from '../../../shared/services/ordenes.service';
 import { TallerStore } from '../../../shared/stores/taller.store';
 import { calcularTotales, importeItem } from '../../../shared/utils/totales';
+import { enlaceWhatsApp } from '../../../shared/utils/whatsapp';
 import { MtBadgeEstado, MtButton, MtEmptyState, MtModal, MtSelect, ToastService } from '../../../shared/ui';
 import type { MtOption } from '../../../shared/ui';
 
@@ -99,6 +100,24 @@ export class OrdenDetalle implements OnInit {
     const e = this.orden()?.estado;
     return e ? TRANSICIONES[e] : [];
   });
+  /** Enlace de WhatsApp con el aviso al cliente según el estado; null si el cliente no tiene un teléfono válido. */
+  readonly whatsapp = computed(() => {
+    const o = this.orden();
+    if (!o) return null;
+    const taller = this.store.tallerActivo()?.nombre ?? 'el taller';
+    const vehiculo = [o.vehiculo_marca, o.vehiculo_modelo].filter(Boolean).join(' ') || 'vehículo';
+    const placa = o.vehiculo_placa ? ` (placa ${o.vehiculo_placa})` : '';
+    const nombre = o.cliente_nombre ?? 'cliente';
+    const total = new Intl.NumberFormat('es-DO', { style: 'currency', currency: 'DOP' }).format(o.total);
+    const mensaje =
+      o.estado === 'listo'
+        ? `Hola ${nombre}, su ${vehiculo}${placa} ya está listo para retirar en ${taller}. Total a pagar: ${total}. ¡Gracias por su confianza!`
+        : o.estado === 'entregado'
+          ? `Hola ${nombre}, gracias por confiar en ${taller}. Su ${vehiculo}${placa} fue entregado. ¡Que lo disfrute!`
+          : `Hola ${nombre}, le informamos que su ${vehiculo}${placa} está en "${ETIQUETA_ESTADO[o.estado]}" (orden ${o.numero}) en ${taller}.`;
+    return enlaceWhatsApp(o.cliente_telefono, mensaje);
+  });
+
   readonly puedeFacturar = computed(() => {
     const e = this.orden()?.estado;
     return (e === 'listo' || e === 'entregado') && !this.factura();

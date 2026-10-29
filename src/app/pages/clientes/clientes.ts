@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, skip } from 'rxjs';
 import { Cliente } from '../../../shared/models/cliente.model';
 import { ClientesService } from '../../../shared/services/clientes.service';
+import { ReportesService } from '../../../shared/services/reportes.service';
+import { descargarArchivo } from '../../../shared/utils/csv';
 import { MtButton, MtCell, MtEmptyState, MtModal, MtPageHeader, MtTable, ToastService } from '../../../shared/ui';
 import type { MtColumn } from '../../../shared/ui';
 import { ClienteForm } from '../../components/cliente-form/cliente-form';
@@ -18,6 +20,8 @@ import { ClienteForm } from '../../components/cliente-form/cliente-form';
 export class Clientes {
   private svc = inject(ClientesService);
   private toast = inject(ToastService);
+  private reportes = inject(ReportesService);
+  exportando = signal(false);
 
   readonly tamano = 25;
   readonly columnas: MtColumn[] = [
@@ -78,6 +82,23 @@ export class Clientes {
   editar(c: Cliente): void {
     this.editando.set(c);
     this.modalAbierto.set(true);
+  }
+
+  async exportar(): Promise<void> {
+    this.exportando.set(true);
+    try {
+      const r = await this.reportes.exportarClientes();
+      if (r.incluidas === 0) {
+        this.toast.error('Aún no hay clientes para exportar');
+        return;
+      }
+      descargarArchivo('clientes.csv', r.csv);
+      this.toast.success(`Descargado (${r.incluidas} clientes)`);
+    } catch (e) {
+      this.toast.error(e instanceof Error ? e.message : 'No se pudo exportar');
+    } finally {
+      this.exportando.set(false);
+    }
   }
 
   guardado(c: Cliente): void {

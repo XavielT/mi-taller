@@ -1,6 +1,7 @@
 <div class="mt-page">
   <mt-page-header title="Clientes" subtitle="Busca, crea y edita los clientes de tu taller.">
     <a class="mt-link" routerLink="/home/recepcion">← Recibir vehículo</a>
+    <mt-button variant="ghost" [loading]="exportando()" (click)="exportar()">Exportar CSV</mt-button>
     <mt-button (click)="nuevo()">Nuevo cliente</mt-button>
   </mt-page-header>
 

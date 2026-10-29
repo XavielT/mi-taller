@@ -4,6 +4,7 @@ import { Rol, Sucursal, Taller } from '../models/taller.model';
 import { AuthService } from '../services/auth.service';
 import { aError } from '../services/supabase-error';
 import { SupabaseService } from '../services/supabase.service';
+import { CLAVE_INVITACION_PENDIENTE } from '../storage-keys';
 
 export const CLAVE_TALLER_ACTIVO = 'mt.tallerActivo';
 
@@ -58,9 +59,36 @@ export class TallerStore {
     return id;
   }
 
+  /** Accepts the invitation saved by /unirse/:token (the user had no session then). A bad or expired token is just dropped. */
+  private async aceptarInvitacionPendiente(): Promise<void> {
+    let token: string | null = null;
+    try {
+      token = localStorage.getItem(CLAVE_INVITACION_PENDIENTE);
+    } catch {
+      return;
+    }
+    if (!token) return;
+    try {
+      await this.client.rpc('aceptar_invitacion', { p_token: token });
+    } finally {
+      try {
+        localStorage.removeItem(CLAVE_INVITACION_PENDIENTE);
+      } catch {
+        // nothing to clean
+      }
+    }
+  }
+
+  /** Reloads sucursales, rol and plan of the active taller after an admin screen changed them. */
+  async refrescar(): Promise<void> {
+    const id = this.tallerId();
+    if (id) await this.cargarDetalle(id);
+  }
+
   async cargar(preferirId?: string): Promise<void> {
     this.cargando.set(true);
     try {
+      await this.aceptarInvitacionPendiente();
       const [talleres, admin] = await Promise.all([this.client.rpc('mis_talleres'), this.client.rpc('es_admin_plataforma')]);
       this.esAdminPlataforma.set(admin.data === true);
       const { data, error } = talleres;

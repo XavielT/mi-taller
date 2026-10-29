@@ -19,6 +19,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/admin/admin').then((m) => m.Admin),
     canActivate: [authGuard, adminGuard],
   },
+  { path: 'unirse/:token', loadComponent: () => import('./pages/unirse/unirse').then((m) => m.Unirse) },
   {
     path: 'suspendido',
     loadComponent: () => import('./pages/suspendido/suspendido').then((m) => m.Suspendido),
@@ -75,6 +76,9 @@ export const routes: Routes = [
       },
       { path: 'inventario', loadComponent: () => import('./pages/inventario/inventario').then((m) => m.Inventario) },
       { path: 'sucursales', loadComponent: () => import('./pages/sucursales/sucursales').then((m) => m.Sucursales) },
+      { path: 'equipo', loadComponent: () => import('./pages/equipo/equipo').then((m) => m.Equipo) },
+      { path: 'configuracion', loadComponent: () => import('./pages/configuracion/configuracion').then((m) => m.Configuracion) },
     ],
   },
+  { path: '**', loadComponent: () => import('./pages/no-encontrado/no-encontrado').then((m) => m.NoEncontrado) },
 ];

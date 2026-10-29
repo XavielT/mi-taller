@@ -1,0 +1,67 @@
+<div class="mt-page">
+  <mt-page-header title="Sucursales" subtitle="Los locales de tu taller. Cada miembro y cada orden pertenece a una sucursal.">
+    @if (esAdmin()) {
+      <mt-button [disabled]="llegoAlLimite()" (click)="nueva()">Nueva sucursal</mt-button>
+    }
+  </mt-page-header>
+
+  @if (limite() !== null) {
+    <p class="mt-muted limite" [class.limite--tope]="llegoAlLimite()">
+      Tu plan permite {{ limite() }} sucursal(es) activa(s): usas {{ activas() }}.
+      @if (llegoAlLimite() && esAdmin()) {
+        Para agregar más, mejora tu plan.
+      }
+    </p>
+  }
+
+  @if (error(); as msg) {
+    <div class="mt-error" role="alert">{{ msg }}</div>
+  }
+
+  <mt-table [columns]="columnas" [rows]="filas()" [loading]="cargando()">
+    <ng-template mtCell="nombre" let-row>
+      <strong>{{ row.nombre }}</strong>
+      @if (row.es_principal) {
+        <span class="chip chip--principal">Principal</span>
+      }
+      <div class="mt-muted">{{ row.direccion || 'Sin dirección' }}</div>
+    </ng-template>
+    <ng-template mtCell="telefono" let-row>{{ row.telefono || '—' }}</ng-template>
+    <ng-template mtCell="estado" let-row>
+      <span class="chip" [class.chip--off]="!row.activa">{{ row.activa ? 'Activa' : 'Desactivada' }}</span>
+    </ng-template>
+    <ng-template mtCell="acciones" let-row>
+      @if (esAdmin()) {
+        <div class="acciones">
+          <mt-button variant="ghost" size="sm" (click)="editar(row)">Editar</mt-button>
+          @if (row.activa && !row.es_principal) {
+            <mt-button variant="ghost" size="sm" (click)="hacerPrincipal(row)">Hacer principal</mt-button>
+          }
+          @if (!row.es_principal) {
+            <mt-button variant="ghost" size="sm" (click)="alternar(row)">{{ row.activa ? 'Desactivar' : 'Activar' }}</mt-button>
+          }
+        </div>
+      }
+    </ng-template>
+    <div empty>
+      <mt-empty-state title="Sin sucursales" text="Tu taller siempre tiene una sucursal principal; si no la ves, recarga la página." />
+    </div>
+  </mt-table>
+</div>
+
+<mt-modal [open]="modalAbierto()" [title]="editando() ? 'Editar sucursal' : 'Nueva sucursal'" (closed)="modalAbierto.set(false)">
+  @if (modalAbierto()) {
+    <form class="mt-stack" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+      <mt-input label="Nombre *" placeholder="Ej: Sucursal Santiago" formControlName="nombre" />
+      <mt-input label="Dirección" formControlName="direccion" />
+      <mt-input label="Teléfono" type="tel" placeholder="809-000-0000" formControlName="telefono" />
+      @if (errorForm(); as msg) {
+        <div class="mt-error" role="alert">{{ msg }}</div>
+      }
+      <div class="mt-actions">
+        <mt-button variant="ghost" (click)="modalAbierto.set(false)">Cancelar</mt-button>
+        <mt-button type="submit" [loading]="guardando()">{{ editando() ? 'Guardar cambios' : 'Crear sucursal' }}</mt-button>
+      </div>
+    </form>
+  }
+</mt-modal>

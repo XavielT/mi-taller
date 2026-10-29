@@ -1,0 +1,57 @@
+<div class="mt-page">
+  <mt-page-header title="Configuración" subtitle="Datos de tu taller, impuestos y logo. Aparecen en tus facturas." />
+
+  @if (!esAdmin()) {
+    <div class="mt-card">
+      <p class="mt-muted">Solo el propietario o un administrador pueden cambiar la configuración del taller.</p>
+    </div>
+  } @else {
+    <section class="mt-card seccion">
+      <h2>Logo</h2>
+      <div class="logo">
+        @if (taller()?.logo_url) {
+          <img class="logo__img" [src]="taller()?.logo_url" alt="Logo de {{ taller()?.nombre }}" />
+        } @else {
+          <div class="logo__vacio">Sin logo</div>
+        }
+        <div class="logo__acciones">
+          <label class="logo__subir" [class.logo__subir--off]="subiendoLogo()">
+            {{ subiendoLogo() ? 'Subiendo...' : taller()?.logo_url ? 'Cambiar logo' : 'Subir logo' }}
+            <input type="file" accept="image/png,image/jpeg,image/webp" [disabled]="subiendoLogo()" (change)="elegirLogo($event)" />
+          </label>
+          @if (taller()?.logo_url) {
+            <mt-button variant="ghost" size="sm" [disabled]="subiendoLogo()" (click)="quitarLogo()">Quitar</mt-button>
+          }
+          <span class="mt-muted">PNG, JPG o WebP, máximo 1 MB.</span>
+        </div>
+      </div>
+    </section>
+
+    <form class="mt-card seccion mt-stack" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+      <h2>Datos del taller</h2>
+      <mt-input label="Nombre *" formControlName="nombre" />
+      <div class="mt-grid-2">
+        <mt-input label="RNC" placeholder="9 u 11 dígitos" hint="Solo números, sin guiones" formControlName="rnc" />
+        <mt-input label="Teléfono" type="tel" placeholder="809-000-0000" formControlName="telefono" />
+      </div>
+      <div class="mt-grid-2">
+        <mt-input label="Correo" type="email" formControlName="email" />
+        <mt-input label="Dirección" formControlName="direccion" />
+      </div>
+
+      <h2>Facturación</h2>
+      <div class="mt-grid-2">
+        <mt-input label="ITBIS (%)" type="number" hint="Tasa que se aplica a los ítems con ITBIS" formControlName="itbis" />
+        <mt-input label="Días para el vencimiento" type="number" hint="Plazo por defecto de cada factura nueva" formControlName="dias_vencimiento" />
+      </div>
+      <p class="mt-muted">Los cambios aplican a las facturas nuevas. Las ya emitidas conservan sus montos.</p>
+
+      @if (error(); as msg) {
+        <div class="mt-error" role="alert">{{ msg }}</div>
+      }
+      <div class="mt-actions">
+        <mt-button type="submit" [loading]="guardando()">Guardar cambios</mt-button>
+      </div>
+    </form>
+  }
+</div>

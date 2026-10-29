@@ -14,6 +14,9 @@
         </div>
         <div class="mt-actions">
           <a class="mt-link" routerLink="/home/reparaciones">← Reparaciones</a>
+          @if (whatsapp(); as wa) {
+            <a class="mt-link" [href]="wa" target="_blank" rel="noopener">Avisar por WhatsApp</a>
+          }
           @if (factura(); as f) {
             <a class="mt-link" [routerLink]="['/home/finanzas/facturas', f.id]">Ver factura {{ f.numero }}</a>
           } @else if (puedeFacturar()) {

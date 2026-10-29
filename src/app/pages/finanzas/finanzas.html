@@ -24,6 +24,18 @@
     </div>
   </section>
 
+  <section class="mt-card exportar" aria-label="Exportar">
+    <div>
+      <strong>Exportar para tu contador</strong>
+      <p class="mt-muted">El 607 es un borrador con las ventas del mes (solo facturas con NCF): revisa el formato vigente de la DGII antes de declarar.</p>
+    </div>
+    <div class="exportar__acciones">
+      <input type="month" aria-label="Mes a exportar" [value]="mesExport()" (change)="mesExport.set($any($event.target).value)" />
+      <mt-button variant="ghost" size="sm" [disabled]="exportando()" (click)="exportar('607')">Descargar 607 (CSV)</mt-button>
+      <mt-button variant="ghost" size="sm" [disabled]="exportando()" (click)="exportar('facturas')">Facturas del mes (CSV)</mt-button>
+    </div>
+  </section>
+
   <section class="invoices">
     <div class="mt-toolbar">
       <div class="filters" role="group" aria-label="Filtrar por estado">

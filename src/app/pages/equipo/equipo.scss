@@ -1,0 +1,62 @@
+.limite {
+  margin: 0 0 1rem;
+
+  &--tope {
+    color: var(--alert);
+  }
+}
+
+.seccion {
+  margin: 1.5rem 0 0.75rem;
+  font-family: var(--font-titles);
+  font-size: 1.15rem;
+}
+
+.nota {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.chip {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: var(--input-bg);
+}
+
+select {
+  height: 2.25rem;
+  padding: 0 0.6rem;
+  border: 1px solid var(--borders);
+  border-radius: 8px;
+  background: var(--surface);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  label {
+    font-size: 0.95rem;
+  }
+
+  select {
+    height: 2.75rem;
+  }
+}
+
+.btn-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.65rem 1.1rem;
+  border: 1px solid var(--borders);
+  border-radius: var(--radius);
+  color: var(--primary);
+  text-decoration: none;
+  font-family: var(--font-btns);
+}
