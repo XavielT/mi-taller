@@ -105,3 +105,17 @@ Nivel por encima de los roles de cada taller: usuarios listados en `mitaller.adm
 
 ## Registro en el proyecto compartido x-core
 El trigger `public.enforce_invite_only` (Music Hub) rechaza registros salvo correo permitido, invitación o `raw_user_meta_data.app` autorizado. Mi Taller envía `app: 'mitaller'` y requiere agregarlo a esa lista (migración `004`). Mover Mi Taller a su propio proyecto elimina esta dependencia.
+
+
+## Inventario (migración 007)
+Stock = suma de `movimientos_inventario` (entrada +, salida −, ajuste con signo), un stock por taller. La pieza sale al agregar el ítem a una orden con `articulo_id` y vuelve al cambiar la cantidad, quitar el ítem, cambiar de artículo, cancelar o borrar la orden: todo en triggers (`orden_items_stock_trg`, `ordenes_cancelar_stock_trg`, `ordenes_borrar_stock_trg`) sobre el único escritor `_mover_stock`, que bloquea la fila del artículo y rechaza stock negativo. Los movimientos no se insertan desde el cliente: solo `crear_articulo` y `registrar_movimiento`. Vista `articulos_stock` (stock y `bajo_minimo`).
+
+## Sucursales y equipo (migración 008)
+- Sucursales: escritura solo por RPC (`crear_sucursal`, `actualizar_sucursal`, `activar_sucursal`, `definir_sucursal_principal`); límite de `planes.limites.sucursales`; una sola principal (índice parcial único). `crear_orden` usa la sucursal del miembro y, si no tiene, la principal.
+- Equipo: `invitaciones` con **token secreto** (se guarda su hash, el token en claro solo se devuelve al crear). No se liga al correo porque x-core no verifica correos al registrarse. `ver_invitacion` es el único RPC accesible sin sesión. `aceptar_invitacion` crea la membresía; si el usuario aún no tenía sesión, el token espera en `localStorage` (`mt.invitacionPendiente`) y `TallerStore.cargar()` lo acepta. Cambios de miembros solo por RPC (`cambiar_miembro`, `quitar_miembro`): solo el propietario asigna o quita administradores; el propietario no se toca. Límite `usuarios` cuenta miembros activos más invitaciones pendientes.
+
+## Configuración, logo y reportes (migración 009)
+`actualizar_taller` y `definir_logo` reemplazan el update directo de `talleres` (que permitía tocar `contadores`). Logo en el bucket público `mt-logos/<taller_id>/…`, solo propietario o administrador escriben. `reporte_607` devuelve una fila por factura no anulada del período; el CSV (solo facturas con NCF) es un borrador para el contador, no el archivo de carga de la DGII. Exportes de clientes y facturas se generan en el navegador.
+
+## Ajustes del advisor (migración 010)
+`auth.uid()` evaluado una vez por consulta en políticas RLS, índices en llaves foráneas por sucursal/artículo/plan y `search_path` fijo en `_hash_token`. Los avisos "SECURITY DEFINER ejecutable por authenticated" de las RPC de `mitaller` son por diseño: cada una valida el rol dentro.

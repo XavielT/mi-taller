@@ -46,3 +46,14 @@ Leyenda: `[x]` verificado sin base de datos (build, tests unitarios o revisión 
 - [x] `sql/2026-10-29_004_xcore_registro_abierto_mitaller.sql` aplicada en x-core (2026-10-29, con autorización de Xaviel). Sin ella, `signUp` fallaba con "Sign-ups are invite-only" (trigger `enforce_invite_only`, de Music Hub).
 - [ ] Iniciar sesión con `xavieldev@gmail.com` → aparece el enlace "Administración" y `/admin` carga métricas, talleres y usuarios.
 - [ ] Cambiar el plan de un taller y suspenderlo/reactivarlo desde `/admin`.
+
+## Ronda de mejoras (2026-10-29) — migraciones 007 a 010 aplicadas en x-core
+Probadas en transacciones descartadas: inventario (15 verificaciones), sucursales y equipo (25), configuración y 607 (10).
+- [ ] **Inventario:** crear un artículo con stock inicial → agregarlo a una orden desde el selector de ítems → el stock baja. Cambiar la cantidad, quitar el ítem o cancelar la orden lo devuelve. Pedir más de lo que hay muestra "Stock insuficiente". Filtro "Stock bajo" y modal de Movimientos (entrada, salida, ajuste).
+- [ ] **Sucursales:** en plan Gratis el botón "Nueva sucursal" queda bloqueado con el aviso del límite; con plan Pro se crean, se define la principal y se desactivan (no la principal ni una con órdenes abiertas).
+- [ ] **Equipo:** invitar a alguien → aparece el enlace una sola vez (copiar / WhatsApp) → abrirlo en otra ventana: sin sesión muestra el taller y el rol; al iniciar sesión o registrarse entra directo al taller. Cambiar rol y sucursal, quitar miembro (pierde el acceso). Límite de 3 usuarios en Gratis (cuentan las invitaciones pendientes).
+- [ ] **Configuración:** editar datos, ITBIS y días de vencimiento; subir y quitar el logo (PNG/JPG/WebP, máx. 1 MB); el logo sale en el menú y en la factura impresa.
+- [ ] **Exportes:** en Finanzas, 607 (CSV, solo facturas con NCF) y Facturas del mes; en Clientes, Exportar CSV. Abrir en Excel: acentos correctos.
+- [ ] **WhatsApp:** botón "Avisar por WhatsApp" en la orden (solo si el cliente tiene un teléfono válido); el mensaje cambia con el estado.
+- [ ] **404:** una dirección inexistente muestra "Página no encontrada".
+- [ ] Un `mecanico` no ve "Configuración" y no puede invitar ni quitar personas.
