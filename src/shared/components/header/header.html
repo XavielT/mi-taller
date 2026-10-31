@@ -6,7 +6,7 @@
       <div class="app-name">Mi Taller</div>
     </div>
     <div class="search">
-      <input placeholder="Buscar facturas, vehículo o cliente..." disabled title="Próximamente" />
+      <input type="search" placeholder="Buscar cliente por nombre, teléfono o documento..." aria-label="Buscar cliente" [value]="busqueda()" (input)="busqueda.set($any($event.target).value)" (keydown.enter)="buscar()" />
     </div>
   </div>
   <div class="topbar__right">

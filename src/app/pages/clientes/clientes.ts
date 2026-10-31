@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, skip } from 'rxjs';
 import { Cliente } from '../../../shared/models/cliente.model';
 import { ClientesService } from '../../../shared/services/clientes.service';
@@ -21,6 +21,7 @@ export class Clientes {
   private svc = inject(ClientesService);
   private toast = inject(ToastService);
   private reportes = inject(ReportesService);
+  private route = inject(ActivatedRoute);
   exportando = signal(false);
 
   readonly tamano = 25;
@@ -45,6 +46,12 @@ export class Clientes {
   private ultimaCarga = 0;
 
   constructor() {
+    // the top-bar search arrives as ?q=...; set it before the first load so the list opens already filtered
+    this.busqueda.set(this.route.snapshot.queryParamMap.get('q') ?? '');
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((p) => {
+      const q = p.get('q');
+      if (q !== null && q !== this.busqueda()) this.busqueda.set(q);
+    });
     void this.cargar();
     toObservable(this.busqueda)
       .pipe(skip(1), debounceTime(300), distinctUntilChanged(), takeUntilDestroyed())

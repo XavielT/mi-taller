@@ -103,7 +103,7 @@ export class OrdenDetalle implements OnInit {
   /** Enlace de WhatsApp con el aviso al cliente según el estado; null si el cliente no tiene un teléfono válido. */
   readonly whatsapp = computed(() => {
     const o = this.orden();
-    if (!o) return null;
+    if (!o || o.estado === 'cancelado') return null;
     const taller = this.store.tallerActivo()?.nombre ?? 'el taller';
     const vehiculo = [o.vehiculo_marca, o.vehiculo_modelo].filter(Boolean).join(' ') || 'vehículo';
     const placa = o.vehiculo_placa ? ` (placa ${o.vehiculo_placa})` : '';
