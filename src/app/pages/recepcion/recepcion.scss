@@ -167,3 +167,8 @@ h2 {
   color: inherit;
   opacity: 0.6;
 }
+
+/* .mt-search grows with flex-basis 16rem for toolbars; in the wizard's column layout that would be a height */
+.mt-search {
+  flex: 0 0 auto;
+}

@@ -143,6 +143,12 @@ app-home > main.app-main {
     font-size: 1rem;
 }
 
+/* inside column layouts (forms, modals) the 16rem flex-basis would become a height */
+.mt-stack > .mt-search,
+.campo > .mt-search {
+    flex: 0 0 auto;
+}
+
 .mt-grid-2 {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
