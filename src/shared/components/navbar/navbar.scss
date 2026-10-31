@@ -1,6 +1,10 @@
 .sidebar {
 	width: 260px;
-	min-height: 100vh;
+	/* stays in view while the page scrolls (the mobile drawer below switches to fixed) */
+	position: sticky;
+	top: 0;
+	height: 100vh;
+	overflow-y: auto;
 	background: linear-gradient(180deg, var(--primary) 0%, var(--primary2) 100%);
 	color: var(--titles);
 	display: flex;

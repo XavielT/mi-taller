@@ -280,37 +280,44 @@ export class OrdenDetalle implements OnInit {
     }
   }
 
-  async editarItem(item: OrdenItem, cambios: Partial<ItemInput & { completado: boolean }>): Promise<void> {
+  /** Saves an item change; returns false when the DB refused it (the screen is reloaded with what the DB has). */
+  async editarItem(item: OrdenItem, cambios: Partial<ItemInput & { completado: boolean }>): Promise<boolean> {
     try {
       const guardado = await this.svc.actualizarItem(item.id, cambios);
       this.items.update((l) => l.map((x) => (x.id === guardado.id ? guardado : x)));
       await this.refrescarResumen();
       if (guardado.articulo_id) void this.cargarArticulos();
+      return true;
     } catch (e) {
       this.toast.error(e instanceof Error ? e.message : 'No se pudo guardar el ítem');
       this.items.set(await this.svc.items(this.ordenId)); // snap back to what the DB has
+      return false;
     }
   }
 
-  editarNumero(item: OrdenItem, campo: 'cantidad' | 'precio_unitario', texto: string): void {
-    const n = Number(texto);
+  /**
+   * Input handlers receive the element so a refused value can be put back: the template binds `[value]` to the stored
+   * value, which does not change on a refusal, so Angular would otherwise leave the rejected text in the field.
+   */
+  async editarNumero(item: OrdenItem, campo: 'cantidad' | 'precio_unitario', input: HTMLInputElement): Promise<void> {
+    const n = Number(input.value);
     const minimo = campo === 'cantidad' ? 0.01 : 0;
     if (!Number.isFinite(n) || n < minimo) {
       this.toast.error(campo === 'cantidad' ? 'La cantidad debe ser mayor que cero' : 'El precio no puede ser negativo');
-      this.items.update((l) => [...l]); // force the inputs back to the stored value
+      input.value = String(item[campo]);
       return;
     }
-    if (n !== item[campo]) void this.editarItem(item, { [campo]: n });
+    if (n !== item[campo] && !(await this.editarItem(item, { [campo]: n }))) input.value = String(item[campo]);
   }
 
-  editarDescripcion(item: OrdenItem, texto: string): void {
-    const t = texto.trim();
+  async editarDescripcion(item: OrdenItem, input: HTMLInputElement): Promise<void> {
+    const t = input.value.trim();
     if (!t) {
       this.toast.error('La descripción es requerida');
-      this.items.update((l) => [...l]);
+      input.value = item.descripcion;
       return;
     }
-    if (t !== item.descripcion) void this.editarItem(item, { descripcion: t });
+    if (t !== item.descripcion && !(await this.editarItem(item, { descripcion: t }))) input.value = item.descripcion;
   }
 
   async eliminarItem(item: OrdenItem): Promise<void> {

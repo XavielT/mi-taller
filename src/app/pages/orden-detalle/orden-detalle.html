@@ -122,7 +122,7 @@
                 </td>
                 <td>
                   @if (editable()) {
-                    <input class="celda" type="text" [value]="i.descripcion" (change)="editarDescripcion(i, $any($event.target).value)" />
+                    <input class="celda" type="text" [value]="i.descripcion" (change)="editarDescripcion(i, $any($event.target))" />
                   } @else {
                     {{ i.descripcion }}
                   }
@@ -132,14 +132,14 @@
                 </td>
                 <td class="num">
                   @if (editable()) {
-                    <input class="celda celda--num" type="number" min="0.01" step="0.01" [value]="i.cantidad" (change)="editarNumero(i, 'cantidad', $any($event.target).value)" />
+                    <input class="celda celda--num" type="number" min="0.01" step="0.01" [value]="i.cantidad" (change)="editarNumero(i, 'cantidad', $any($event.target))" />
                   } @else {
                     {{ i.cantidad }}
                   }
                 </td>
                 <td class="num">
                   @if (editable()) {
-                    <input class="celda celda--num" type="number" min="0" step="0.01" [value]="i.precio_unitario" (change)="editarNumero(i, 'precio_unitario', $any($event.target).value)" />
+                    <input class="celda celda--num" type="number" min="0" step="0.01" [value]="i.precio_unitario" (change)="editarNumero(i, 'precio_unitario', $any($event.target))" />
                   } @else {
                     {{ i.precio_unitario | currency }}
                   }
