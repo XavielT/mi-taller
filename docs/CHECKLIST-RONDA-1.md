@@ -57,3 +57,8 @@ Probadas en transacciones descartadas: inventario (15 verificaciones), sucursale
 - [ ] **WhatsApp:** botón "Avisar por WhatsApp" en la orden (solo si el cliente tiene un teléfono válido); el mensaje cambia con el estado.
 - [ ] **404:** una dirección inexistente muestra "Página no encontrada".
 - [ ] Un `mecanico` no ve "Configuración" y no puede invitar ni quitar personas.
+
+## Prueba de punta a punta en el navegador (2026-10-31, producción, cuenta de pruebas)
+Recorrido completo como usuario de un taller; todo lo siguiente funcionó: crear artículo con stock inicial → recepción (cliente nuevo, vehículo, orden con inventario de entrada) → agregar ítems (del inventario y mano de obra) con totales correctos y stock descontado → rechazo de cantidad mayor al stock → Diagnóstico/En progreso/Listo con comentario → facturar con NCF → pago mayor al saldo bloqueado, pago parcial y saldo (factura Pagada) → Entregado con fecha → tablero y finanzas con cifras → tablero Kanban (flechas, arrastrar, salto no permitido rechazado) → cancelar orden (exige motivo, devuelve stock) → movimientos de inventario → límite de sucursales del plan Gratis → invitación (enlace, página pública, cancelar) → configuración (validación de RNC, guardar ITBIS) → aviso por WhatsApp → búsqueda superior → 404.
+Pendiente de probar a mano: subir foto en la recepción, subir logo, descargas CSV (607, facturas, clientes), impresión/PDF y Google.
+Defectos encontrados y corregidos en esa prueba: campo editado y rechazado quedaba con el valor viejo, menú lateral que se cortaba al hacer scroll, campos de búsqueda altísimos en columnas, tablero que ensanchaba toda la página, texto sin fuente en modales, buscador superior inactivo, pantalla en blanco en pestañas abiertas durante un despliegue.
